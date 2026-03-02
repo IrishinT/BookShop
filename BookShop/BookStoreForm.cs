@@ -5,6 +5,8 @@ namespace BookShop
         public BookStoreForm()
         {
             InitializeComponent();
+
+            this.DoubleBuffered = true;
         }
     }
 }

@@ -33,7 +33,7 @@ namespace BookShop
             shopPage = new TabPage();
             newBookPage = new TabPage();
             tableLayoutPanel1 = new TableLayoutPanel();
-            textBox1 = new TextBox();
+            idField = new TextBox();
             idLabel = new Label();
             priceNumbericUpDown = new NumericUpDown();
             priceLabel = new Label();
@@ -43,11 +43,11 @@ namespace BookShop
             bookNameField = new TextBox();
             bookNameLabel = new Label();
             authorLabel = new Label();
-            ganreComboBox = new ComboBox();
             pagesCountNumbericUpDown = new NumericUpDown();
             flowLayoutPanel1 = new FlowLayoutPanel();
             createBookBtn = new Button();
-            button1 = new Button();
+            generateBookBtn = new Button();
+            ganreComboBox = new ComboBox();
             bookFormTabControl.SuspendLayout();
             newBookPage.SuspendLayout();
             tableLayoutPanel1.SuspendLayout();
@@ -70,6 +70,7 @@ namespace BookShop
             // 
             // shopPage
             // 
+            shopPage.BackgroundImage = (Image)resources.GetObject("shopPage.BackgroundImage");
             shopPage.Location = new Point(4, 29);
             shopPage.Name = "shopPage";
             shopPage.Padding = new Padding(3);
@@ -80,6 +81,9 @@ namespace BookShop
             // 
             // newBookPage
             // 
+            newBookPage.BackColor = Color.White;
+            newBookPage.BackgroundImage = (Image)resources.GetObject("newBookPage.BackgroundImage");
+            newBookPage.BackgroundImageLayout = ImageLayout.Center;
             newBookPage.Controls.Add(tableLayoutPanel1);
             newBookPage.Location = new Point(4, 29);
             newBookPage.Name = "newBookPage";
@@ -87,14 +91,15 @@ namespace BookShop
             newBookPage.Size = new Size(792, 417);
             newBookPage.TabIndex = 1;
             newBookPage.Text = "Новая книга";
-            newBookPage.UseVisualStyleBackColor = true;
             // 
             // tableLayoutPanel1
             // 
+            tableLayoutPanel1.BackColor = Color.Transparent;
+            tableLayoutPanel1.BackgroundImageLayout = ImageLayout.None;
             tableLayoutPanel1.ColumnCount = 2;
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30.8093987F));
-            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 69.1906F));
-            tableLayoutPanel1.Controls.Add(textBox1, 1, 5);
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 150F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanel1.Controls.Add(idField, 1, 5);
             tableLayoutPanel1.Controls.Add(idLabel, 0, 5);
             tableLayoutPanel1.Controls.Add(priceNumbericUpDown, 1, 4);
             tableLayoutPanel1.Controls.Add(priceLabel, 0, 4);
@@ -104,39 +109,39 @@ namespace BookShop
             tableLayoutPanel1.Controls.Add(bookNameField, 1, 0);
             tableLayoutPanel1.Controls.Add(bookNameLabel, 0, 0);
             tableLayoutPanel1.Controls.Add(authorLabel, 0, 1);
-            tableLayoutPanel1.Controls.Add(ganreComboBox, 1, 2);
             tableLayoutPanel1.Controls.Add(pagesCountNumbericUpDown, 1, 3);
             tableLayoutPanel1.Controls.Add(flowLayoutPanel1, 1, 6);
+            tableLayoutPanel1.Controls.Add(ganreComboBox, 1, 2);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(3, 3);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
-            tableLayoutPanel1.Padding = new Padding(10);
+            tableLayoutPanel1.Padding = new Padding(20, 40, 20, 20);
             tableLayoutPanel1.RowCount = 7;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 57.4074059F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 42.5925941F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 46F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 66F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 57F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 58F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 68F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.Size = new Size(786, 411);
             tableLayoutPanel1.TabIndex = 0;
             // 
-            // textBox1
+            // idField
             // 
-            textBox1.Anchor = AnchorStyles.Left;
-            textBox1.Location = new Point(261, 289);
-            textBox1.Margin = new Padding(15, 3, 3, 3);
-            textBox1.Name = "textBox1";
-            textBox1.ReadOnly = true;
-            textBox1.Size = new Size(134, 27);
-            textBox1.TabIndex = 11;
+            idField.Anchor = AnchorStyles.Left;
+            idField.Location = new Point(185, 246);
+            idField.Margin = new Padding(15, 3, 3, 3);
+            idField.Name = "idField";
+            idField.ReadOnly = true;
+            idField.Size = new Size(134, 27);
+            idField.TabIndex = 11;
             // 
             // idLabel
             // 
             idLabel.Anchor = AnchorStyles.Right;
             idLabel.AutoSize = true;
-            idLabel.Location = new Point(207, 293);
+            idLabel.Location = new Point(131, 250);
             idLabel.Margin = new Padding(3, 0, 15, 0);
             idLabel.Name = "idLabel";
             idLabel.Size = new Size(24, 20);
@@ -146,7 +151,7 @@ namespace BookShop
             // priceNumbericUpDown
             // 
             priceNumbericUpDown.Anchor = AnchorStyles.Left;
-            priceNumbericUpDown.Location = new Point(261, 232);
+            priceNumbericUpDown.Location = new Point(185, 206);
             priceNumbericUpDown.Margin = new Padding(15, 3, 3, 3);
             priceNumbericUpDown.Name = "priceNumbericUpDown";
             priceNumbericUpDown.Size = new Size(134, 27);
@@ -156,7 +161,7 @@ namespace BookShop
             // 
             priceLabel.Anchor = AnchorStyles.Right;
             priceLabel.AutoSize = true;
-            priceLabel.Location = new Point(186, 235);
+            priceLabel.Location = new Point(110, 210);
             priceLabel.Margin = new Padding(3, 0, 15, 0);
             priceLabel.Name = "priceLabel";
             priceLabel.Size = new Size(45, 20);
@@ -167,10 +172,10 @@ namespace BookShop
             // 
             pagesCountLabel.Anchor = AnchorStyles.Right;
             pagesCountLabel.AutoSize = true;
-            pagesCountLabel.Location = new Point(80, 174);
+            pagesCountLabel.Location = new Point(61, 160);
             pagesCountLabel.Margin = new Padding(3, 0, 15, 0);
             pagesCountLabel.Name = "pagesCountLabel";
-            pagesCountLabel.Size = new Size(151, 20);
+            pagesCountLabel.Size = new Size(94, 40);
             pagesCountLabel.TabIndex = 6;
             pagesCountLabel.Text = "Количество страниц";
             // 
@@ -178,7 +183,7 @@ namespace BookShop
             // 
             ganreLabel.Anchor = AnchorStyles.Right;
             ganreLabel.AutoSize = true;
-            ganreLabel.Location = new Point(183, 118);
+            ganreLabel.Location = new Point(107, 130);
             ganreLabel.Margin = new Padding(3, 0, 15, 0);
             ganreLabel.Name = "ganreLabel";
             ganreLabel.Size = new Size(48, 20);
@@ -187,27 +192,29 @@ namespace BookShop
             // 
             // authorField
             // 
-            authorField.Anchor = AnchorStyles.Left;
-            authorField.Location = new Point(261, 71);
+            authorField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            authorField.Location = new Point(185, 86);
             authorField.Margin = new Padding(15, 3, 3, 3);
+            authorField.MaximumSize = new Size(1000, 0);
             authorField.Name = "authorField";
-            authorField.Size = new Size(377, 27);
+            authorField.Size = new Size(578, 27);
             authorField.TabIndex = 3;
             // 
             // bookNameField
             // 
-            bookNameField.Anchor = AnchorStyles.Left;
-            bookNameField.Location = new Point(261, 24);
+            bookNameField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            bookNameField.Location = new Point(185, 46);
             bookNameField.Margin = new Padding(15, 3, 3, 3);
+            bookNameField.MaximumSize = new Size(1000, 0);
             bookNameField.Name = "bookNameField";
-            bookNameField.Size = new Size(377, 27);
+            bookNameField.Size = new Size(578, 27);
             bookNameField.TabIndex = 0;
             // 
             // bookNameLabel
             // 
             bookNameLabel.Anchor = AnchorStyles.Right;
             bookNameLabel.AutoSize = true;
-            bookNameLabel.Location = new Point(110, 27);
+            bookNameLabel.Location = new Point(34, 50);
             bookNameLabel.Margin = new Padding(3, 0, 15, 0);
             bookNameLabel.Name = "bookNameLabel";
             bookNameLabel.Size = new Size(121, 20);
@@ -218,28 +225,17 @@ namespace BookShop
             // 
             authorLabel.Anchor = AnchorStyles.Right;
             authorLabel.AutoSize = true;
-            authorLabel.Location = new Point(180, 75);
+            authorLabel.Location = new Point(104, 90);
             authorLabel.Margin = new Padding(3, 0, 15, 0);
             authorLabel.Name = "authorLabel";
             authorLabel.Size = new Size(51, 20);
             authorLabel.TabIndex = 2;
             authorLabel.Text = "Автор";
             // 
-            // ganreComboBox
-            // 
-            ganreComboBox.Anchor = AnchorStyles.Left;
-            ganreComboBox.FormattingEnabled = true;
-            ganreComboBox.Items.AddRange(new object[] { "Роман", "Повесть", "Рассказ", "Проза", "Эпос", "Лирика", "Драма", "Фантастика", "Фэнтези", "Детектив", "Триллер", "Любовный роман", "Биография", "Психология", "Научно-популярная литература" });
-            ganreComboBox.Location = new Point(261, 116);
-            ganreComboBox.Margin = new Padding(15, 3, 3, 3);
-            ganreComboBox.Name = "ganreComboBox";
-            ganreComboBox.Size = new Size(377, 28);
-            ganreComboBox.TabIndex = 5;
-            // 
             // pagesCountNumbericUpDown
             // 
             pagesCountNumbericUpDown.Anchor = AnchorStyles.Left;
-            pagesCountNumbericUpDown.Location = new Point(261, 170);
+            pagesCountNumbericUpDown.Location = new Point(185, 166);
             pagesCountNumbericUpDown.Margin = new Padding(15, 3, 3, 3);
             pagesCountNumbericUpDown.Name = "pagesCountNumbericUpDown";
             pagesCountNumbericUpDown.Size = new Size(134, 27);
@@ -248,12 +244,12 @@ namespace BookShop
             // flowLayoutPanel1
             // 
             flowLayoutPanel1.Controls.Add(createBookBtn);
-            flowLayoutPanel1.Controls.Add(button1);
+            flowLayoutPanel1.Controls.Add(generateBookBtn);
             flowLayoutPanel1.Dock = DockStyle.Fill;
-            flowLayoutPanel1.Location = new Point(249, 335);
+            flowLayoutPanel1.Location = new Point(173, 283);
             flowLayoutPanel1.Margin = new Padding(3, 3, 15, 3);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Size = new Size(512, 63);
+            flowLayoutPanel1.Size = new Size(578, 105);
             flowLayoutPanel1.TabIndex = 12;
             // 
             // createBookBtn
@@ -267,17 +263,29 @@ namespace BookShop
             createBookBtn.Text = "Создать";
             createBookBtn.UseVisualStyleBackColor = true;
             // 
-            // button1
+            // generateBookBtn
             // 
-            button1.Anchor = AnchorStyles.None;
-            button1.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            button1.Location = new Point(132, 3);
-            button1.Margin = new Padding(15, 3, 3, 3);
-            button1.Name = "button1";
-            button1.Size = new Size(157, 60);
-            button1.TabIndex = 1;
-            button1.Text = "Сгенерировать";
-            button1.UseVisualStyleBackColor = true;
+            generateBookBtn.Anchor = AnchorStyles.None;
+            generateBookBtn.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            generateBookBtn.Location = new Point(132, 3);
+            generateBookBtn.Margin = new Padding(15, 3, 3, 3);
+            generateBookBtn.Name = "generateBookBtn";
+            generateBookBtn.Size = new Size(157, 60);
+            generateBookBtn.TabIndex = 1;
+            generateBookBtn.Text = "Сгенерировать";
+            generateBookBtn.UseVisualStyleBackColor = true;
+            // 
+            // ganreComboBox
+            // 
+            ganreComboBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            ganreComboBox.FormattingEnabled = true;
+            ganreComboBox.Items.AddRange(new object[] { "Роман", "Повесть", "Рассказ", "Проза", "Эпос", "Лирика", "Драма", "Фантастика", "Фэнтези", "Детектив", "Триллер", "Любовный роман", "Биография", "Психология", "Научно-популярная литература" });
+            ganreComboBox.Location = new Point(185, 128);
+            ganreComboBox.Margin = new Padding(15, 3, 3, 3);
+            ganreComboBox.MaximumSize = new Size(1000, 0);
+            ganreComboBox.Name = "ganreComboBox";
+            ganreComboBox.Size = new Size(578, 28);
+            ganreComboBox.TabIndex = 5;
             // 
             // BookStoreForm
             // 
@@ -314,10 +322,10 @@ namespace BookShop
         private Label priceLabel;
         private Label pagesCountLabel;
         private NumericUpDown pagesCountNumbericUpDown;
-        private TextBox textBox1;
+        private TextBox idField;
         private Label idLabel;
         private FlowLayoutPanel flowLayoutPanel1;
         private Button createBookBtn;
-        private Button button1;
+        private Button generateBookBtn;
     }
 }
