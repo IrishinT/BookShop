@@ -71,6 +71,7 @@ namespace BookShop
             // shopPage
             // 
             shopPage.BackgroundImage = (Image)resources.GetObject("shopPage.BackgroundImage");
+            shopPage.BackgroundImageLayout = ImageLayout.Stretch;
             shopPage.Location = new Point(4, 29);
             shopPage.Name = "shopPage";
             shopPage.Padding = new Padding(3);
@@ -83,7 +84,7 @@ namespace BookShop
             // 
             newBookPage.BackColor = Color.White;
             newBookPage.BackgroundImage = (Image)resources.GetObject("newBookPage.BackgroundImage");
-            newBookPage.BackgroundImageLayout = ImageLayout.Center;
+            newBookPage.BackgroundImageLayout = ImageLayout.Stretch;
             newBookPage.Controls.Add(tableLayoutPanel1);
             newBookPage.Location = new Point(4, 29);
             newBookPage.Name = "newBookPage";
@@ -280,7 +281,7 @@ namespace BookShop
             ganreComboBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             ganreComboBox.FormattingEnabled = true;
             ganreComboBox.Items.AddRange(new object[] { "Роман", "Повесть", "Рассказ", "Проза", "Эпос", "Лирика", "Драма", "Фантастика", "Фэнтези", "Детектив", "Триллер", "Любовный роман", "Биография", "Психология", "Научно-популярная литература" });
-            ganreComboBox.Location = new Point(185, 128);
+            ganreComboBox.Location = new Point(185, 126);
             ganreComboBox.Margin = new Padding(15, 3, 3, 3);
             ganreComboBox.MaximumSize = new Size(1000, 0);
             ganreComboBox.Name = "ganreComboBox";
