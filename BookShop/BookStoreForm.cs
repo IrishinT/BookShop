@@ -7,6 +7,7 @@ namespace BookShop
             InitializeComponent();
 
             this.DoubleBuffered = true;
+            searchTypeCmb.SelectedIndex = 0;
         }
     }
 }
