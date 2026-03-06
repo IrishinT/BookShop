@@ -10,118 +10,60 @@ namespace BookShop
 {
     public partial class BookStoreForm : Form
     {
-        // Ссылки на объекты библиотеки классов
         private Shop shop;
         private List<BookShelf> bookShelves;
         private int nextId = 1;
-
-        // Пути к файлам с данными для генерации
         private readonly string titlesFile = "titles.txt";
         private readonly string authorsFile = "authors.txt";
+        private readonly string genresFile = "genres.txt";
 
         public BookStoreForm()
         {
             InitializeComponent();
 
-            // Настройка при загрузке формы
             this.DoubleBuffered = true;
             searchTypeCmb.SelectedIndex = 0;
 
-            // Подписка на события
             SubscribeToEvents();
-
-            // Инициализация магазина
             InitializeShop();
-
-            // Начальная настройка элементов
             InitializeFormControls();
-
-            // Создание файлов с данными, если их нет
             CreateDataFilesIfNotExist();
+            LoadGenresFromFile();
         }
 
-        /// <summary>
-        /// Подписка на все события формы
-        /// </summary>
         private void SubscribeToEvents()
         {
-            // Кнопки
             createBookBtn.Click += CreateBookBtn_Click;
             generateBookBtn.Click += GenerateBookBtn_Click;
             searchBtn.Click += SearchBtn_Click;
             bookSellBtn.Click += BookSellBtn_Click;
 
-            // Комбобоксы
             shelfSelectCmb.SelectedIndexChanged += ShelfSelectCmb_SelectedIndexChanged;
             bookSelectCmb.SelectedIndexChanged += BookSelectCmb_SelectedIndexChanged;
 
-            // Обработка клавиш
             searchField.KeyPress += SearchField_KeyPress;
             bookNameField.KeyPress += TextBox_KeyPress;
             authorField.KeyPress += TextBox_KeyPress;
-
-            // Обработка события Paint для панели информации о книге
-            bookInfoLayoutPanel.Paint += bookInfoLayoutPanel_Paint;
         }
 
-        /// <summary>
-        /// Обработчик события Paint для панели информации о книге
-        /// </summary>
-        private void bookInfoLayoutPanel_Paint(object sender, PaintEventArgs e)
-        {
-            // Здесь можно добавить код для рисования на панели, если нужно
-            // Например, можно нарисовать рамку или фон
-            Control panel = sender as Control;
-            if (panel != null)
-            {
-                // Рисуем простую рамку вокруг панели
-                using (Pen pen = new Pen(Color.FromArgb(200, 200, 200), 1))
-                {
-                    e.Graphics.DrawRectangle(pen, 0, 0, panel.Width - 1, panel.Height - 1);
-                }
-            }
-        }
+        private void bookInfoLayoutPanel_Paint(object sender, PaintEventArgs e) { }
 
-        /// <summary>
-        /// Инициализация магазина и шкафов
-        /// </summary>
         private void InitializeShop()
         {
             try
             {
-                // Создаем магазин с балансом 0 и максимальным количеством шкафов 5
                 shop = new Shop(0, 5);
-
-                // Создаем несколько шкафов
-                bookShelves = new List<BookShelf>
-                {
-                    new BookShelf(1, "Детектив", 10),
-                    new BookShelf(2, "Фантастика", 10),
-                    new BookShelf(3, "Роман", 10)
-                };
-
-                // Добавляем шкафы в магазин
-                foreach (var shelf in bookShelves)
-                {
-                    shop.AddBookShelf(shelf);
-                }
-
-                // Заполняем комбобокс шкафов
+                bookShelves = new List<BookShelf>();
                 UpdateShelfComboBox();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при инициализации магазина: {ex.Message}",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Ошибка при инициализации магазина: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        /// <summary>
-        /// Начальная настройка элементов формы
-        /// </summary>
         private void InitializeFormControls()
         {
-            // Настройка NumericUpDown
             pagesCountNumbericUpDown.Minimum = 1;
             pagesCountNumbericUpDown.Maximum = 10000;
             pagesCountNumbericUpDown.Value = 100;
@@ -131,21 +73,14 @@ namespace BookShop
             priceNumbericUpDown.DecimalPlaces = 2;
             priceNumbericUpDown.Value = 500;
 
-            // Автоматическая генерация ID
             idField.Text = nextId.ToString();
-
-            // Обновление баланса
             UpdateBalanceDisplay();
         }
 
-        /// <summary>
-        /// Создание файлов с данными для генерации
-        /// </summary>
         private void CreateDataFilesIfNotExist()
         {
             try
             {
-                // Файл с названиями книг
                 if (!File.Exists(titlesFile))
                 {
                     File.WriteAllLines(titlesFile, new string[] {
@@ -155,7 +90,6 @@ namespace BookShop
                     });
                 }
 
-                // Файл с авторами
                 if (!File.Exists(authorsFile))
                 {
                     File.WriteAllLines(authorsFile, new string[] {
@@ -165,50 +99,74 @@ namespace BookShop
                         "Александр Пушкин"
                     });
                 }
+
+                if (!File.Exists(genresFile))
+                {
+                    File.WriteAllLines(genresFile, new string[] {
+                        "Роман", "Фантастика", "Детектив", "Приключения",
+                        "Поэзия", "Драма", "Триллер", "Фэнтези",
+                        "Биография", "Научная литература"
+                    });
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при создании файлов данных: {ex.Message}",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Ошибка при создании файлов данных: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        #region Валидация полей
+        private void LoadGenresFromFile()
+        {
+            try
+            {
+                if (File.Exists(genresFile))
+                {
+                    string[] genres = File.ReadAllLines(genresFile);
+                    ganreComboBox.Items.Clear();
+                    foreach (string genre in genres)
+                    {
+                        if (!string.IsNullOrWhiteSpace(genre))
+                        {
+                            ganreComboBox.Items.Add(genre.Trim());
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при загрузке жанров: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         private bool ValidateBookFields()
         {
             if (string.IsNullOrWhiteSpace(bookNameField.Text))
             {
-                MessageBox.Show("Введите название книги", "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Введите название книги", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
             if (string.IsNullOrWhiteSpace(authorField.Text))
             {
-                MessageBox.Show("Введите автора книги", "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Введите автора книги", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
             if (ganreComboBox.SelectedItem == null)
             {
-                MessageBox.Show("Выберите жанр книги", "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Выберите жанр книги", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
             if (pagesCountNumbericUpDown.Value <= 0)
             {
-                MessageBox.Show("Количество страниц должно быть больше 0", "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Количество страниц должно быть больше 0", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
             if (priceNumbericUpDown.Value <= 0)
             {
-                MessageBox.Show("Цена должна быть больше 0", "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Цена должна быть больше 0", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
@@ -217,20 +175,17 @@ namespace BookShop
 
         private void TextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
-            // Запрещаем ввод цифр в текстовых полях (для названия и автора)
             if (char.IsDigit(e.KeyChar))
             {
                 e.Handled = true;
-                MessageBox.Show("Поле не должно содержать цифры", "Предупреждение",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Поле не должно содержать цифры", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
         private void SearchField_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (searchTypeCmb.SelectedIndex == 1) // Поиск по ID
+            if (searchTypeCmb.SelectedIndex == 1)
             {
-                // Разрешаем только цифры и управляющие клавиши
                 if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
                 {
                     e.Handled = true;
@@ -238,56 +193,48 @@ namespace BookShop
             }
         }
 
-        #endregion
-
-        #region Обработчики кнопок
-
         private void CreateBookBtn_Click(object sender, EventArgs e)
         {
             try
             {
-                // Проверка валидации всех полей
-                if (!ValidateBookFields())
-                {
-                    return;
-                }
+                if (!ValidateBookFields()) return;
 
-                // Получаем выбранный шкаф
-                BookShelf selectedShelf = GetSelectedBookShelf();
-                if (selectedShelf == null)
-                {
-                    MessageBox.Show("Выберите шкаф для книги", "Ошибка",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                // Проверяем жанр книги и шкафа
                 string selectedGenre = ganreComboBox.SelectedItem.ToString();
-                if (selectedShelf.Genre != selectedGenre)
+                BookShelf targetShelf = bookShelves.FirstOrDefault(s =>
+                    s.Genre == selectedGenre && s.CurrentCount < s.Capacity);
+
+                if (targetShelf == null)
                 {
-                    // Проверяем, пуст ли шкаф (можно сменить жанр)
-                    if (selectedShelf.CurrentCount == 0)
+                    BookShelf emptyShelf = bookShelves.FirstOrDefault(s => s.CurrentCount == 0);
+                    if (emptyShelf != null)
                     {
-                        // Меняем жанр пустого шкафа
-                        selectedShelf.ChangeGenre(selectedGenre);
+                        emptyShelf.ChangeGenre(selectedGenre);
+                        targetShelf = emptyShelf;
+                    }
+                }
+
+                if (targetShelf == null)
+                {
+                    if (bookShelves.Count < shop.MaxShelves)
+                    {
+                        int newShelfId = bookShelves.Count > 0 ? bookShelves.Max(s => s.Id) + 1 : 1;
+                        targetShelf = new BookShelf(newShelfId, selectedGenre, 10);
+                        bookShelves.Add(targetShelf);
+                        shop.AddBookShelf(targetShelf);
                     }
                     else
                     {
-                        MessageBox.Show($"В этот шкаф можно ставить только книги жанра '{selectedShelf.Genre}'",
-                            "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("Нет доступных шкафов. Достигнут максимальный лимит.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return;
                     }
                 }
 
-                // Проверяем, есть ли место в шкафу
-                if (selectedShelf.CurrentCount >= selectedShelf.Capacity)
+                if (targetShelf.CurrentCount >= targetShelf.Capacity)
                 {
-                    MessageBox.Show($"В шкафу нет места! Максимальная вместимость: {selectedShelf.Capacity}",
-                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show($"В шкафу нет места! Максимальная вместимость: {targetShelf.Capacity}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                // Создание книги через библиотеку
                 Book newBook = new Book(
                     nextId,
                     bookNameField.Text.Trim(),
@@ -297,32 +244,25 @@ namespace BookShop
                     priceNumbericUpDown.Value
                 );
 
-                // Добавление книги в шкаф через библиотеку
-                if (selectedShelf.AddBook(newBook))
+                if (targetShelf.AddBook(newBook))
                 {
                     nextId++;
                     idField.Text = nextId.ToString();
 
-                    // Очистка полей для новой книги
                     ClearNewBookFields();
-
-                    // Обновление списка книг и названия шкафа
-                    UpdateBooksInShelf();
                     UpdateShelfComboBox();
+                    UpdateBooksInShelf();
 
-                    MessageBox.Show($"Книга '{newBook.Title}' успешно создана!",
-                        "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show($"Книга '{newBook.Title}' успешно создана!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (InvalidOperationException ex)
             {
-                MessageBox.Show(ex.Message, "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при создании книги: {ex.Message}",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Ошибка при создании книги: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -330,45 +270,30 @@ namespace BookShop
         {
             try
             {
-                Random rand = new Random();
+                Book generatedBook = Book.GenerateRandom(nextId);
 
-                // Загрузка названий из файла
-                string[] titles = File.ReadAllLines(titlesFile);
-                string[] authors = File.ReadAllLines(authorsFile);
+                bookNameField.Text = generatedBook.Title;
+                authorField.Text = generatedBook.Author;
 
-                // Получаем все книги из всех шкафов для проверки уникальности
-                var allBooks = bookShelves.SelectMany(s => s.GetAllBooks()).ToList();
-
-                // Проверка на уникальность названия
-                string generatedTitle = titles[rand.Next(titles.Length)];
-                int duplicateCount = allBooks.Count(b => b.Title.StartsWith(generatedTitle));
-
-                if (duplicateCount > 0)
+                for (int i = 0; i < ganreComboBox.Items.Count; i++)
                 {
-                    generatedTitle = $"{generatedTitle} {duplicateCount + 1}";
+                    if (ganreComboBox.Items[i].ToString() == generatedBook.Genre)
+                    {
+                        ganreComboBox.SelectedIndex = i;
+                        break;
+                    }
                 }
 
-                // Заполнение полей
-                bookNameField.Text = generatedTitle;
-                authorField.Text = authors[rand.Next(authors.Length)];
-
-                // Случайный выбор жанра
-                if (ganreComboBox.Items.Count > 0)
-                {
-                    ganreComboBox.SelectedIndex = rand.Next(ganreComboBox.Items.Count);
-                }
-
-                // Случайные числа
-                pagesCountNumbericUpDown.Value = rand.Next(50, 1000);
-                priceNumbericUpDown.Value = rand.Next(100, 5000);
+                pagesCountNumbericUpDown.Value = generatedBook.Pages;
+                priceNumbericUpDown.Value = generatedBook.Price;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при генерации книги: {ex.Message}",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Ошибка при генерации книги: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
+        // ===== Исправленный метод поиска книги =====
         private void SearchBtn_Click(object sender, EventArgs e)
         {
             try
@@ -377,60 +302,61 @@ namespace BookShop
 
                 if (string.IsNullOrWhiteSpace(searchText))
                 {
-                    MessageBox.Show("Введите текст для поиска", "Предупреждение",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Введите текст для поиска", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
                 Book foundBook = null;
 
-                if (searchTypeCmb.SelectedIndex == 0) // Поиск по названию
+                if (searchTypeCmb.SelectedIndex == 0)
                 {
-                    // Ищем книгу во всех шкафах
                     foreach (var shelf in bookShelves)
                     {
                         foundBook = shelf.FindBookByTitle(searchText);
-                        if (foundBook != null)
-                            break;
+                        if (foundBook != null) break;
                     }
                 }
-                else // Поиск по ID
+                else
                 {
                     if (int.TryParse(searchText, out int id))
                     {
-                        // Ищем книгу во всех шкафах
                         foreach (var shelf in bookShelves)
                         {
                             foundBook = shelf.FindBookById(id);
-                            if (foundBook != null)
-                                break;
+                            if (foundBook != null) break;
                         }
                     }
                     else
                     {
-                        MessageBox.Show("ID должен быть числом", "Ошибка",
-                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("ID должен быть числом", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return;
                     }
                 }
 
                 if (foundBook != null)
                 {
-                    DisplayBookInfo(foundBook);
+                    BookShelf foundShelf = bookShelves.FirstOrDefault(s => s.FindBookById(foundBook.Id) != null);
+                    if (foundShelf != null)
+                    {
+                        shelfSelectCmb.SelectedIndex = bookShelves.IndexOf(foundShelf);
+                        UpdateBooksInShelf();
 
-                    // Выбираем нужный шкаф в комбобоксе
-                    SelectShelfByBook(foundBook);
+                        int bookIndex = bookSelectCmb.Items.Cast<string>()
+                                        .ToList()
+                                        .FindIndex(item => ExtractBookId(item) == foundBook.Id);
+                        if (bookIndex >= 0) bookSelectCmb.SelectedIndex = bookIndex;
+
+                        DisplayBookInfo(foundBook);
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("Книга не найдена", "Результат поиска",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Книга не найдена", "Результат поиска", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при поиске: {ex.Message}",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Ошибка при поиске: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -440,16 +366,13 @@ namespace BookShop
             {
                 if (bookSelectCmb.SelectedItem == null)
                 {
-                    MessageBox.Show("Выберите книгу для продажи", "Предупреждение",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Выберите книгу для продажи", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                // Получаем выбранную книгу
                 string selectedBookInfo = bookSelectCmb.SelectedItem.ToString();
                 int bookId = ExtractBookId(selectedBookInfo);
 
-                // Находим шкаф с этой книгой
                 BookShelf targetShelf = null;
                 Book bookToSell = null;
 
@@ -465,37 +388,24 @@ namespace BookShop
 
                 if (bookToSell != null && targetShelf != null)
                 {
-                    // Продажа через библиотеку
                     if (targetShelf.RemoveBook(bookId))
                     {
-                        // Увеличиваем баланс магазина
                         shop.AddToBalance(bookToSell.Price);
                         UpdateBalanceDisplay();
-
-                        // Обновляем списки
                         UpdateBooksInShelf();
                         ClearBookInfo();
 
-                        MessageBox.Show($"Книга '{bookToSell.Title}' продана за {bookToSell.Price} руб.",
-                            "Продажа", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show($"Книга '{bookToSell.Title}' продана за {bookToSell.Price} руб.", "Продажа", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при продаже: {ex.Message}",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Ошибка при продаже: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        #endregion
-
-        #region Обработчики комбобоксов
-
-        private void ShelfSelectCmb_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            UpdateBooksInShelf();
-        }
+        private void ShelfSelectCmb_SelectedIndexChanged(object sender, EventArgs e) => UpdateBooksInShelf();
 
         private void BookSelectCmb_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -504,26 +414,16 @@ namespace BookShop
                 string selectedBookInfo = bookSelectCmb.SelectedItem.ToString();
                 int bookId = ExtractBookId(selectedBookInfo);
 
-                // Ищем книгу в текущем шкафу
                 BookShelf selectedShelf = GetSelectedBookShelf();
                 if (selectedShelf != null)
                 {
                     Book selectedBook = selectedShelf.FindBookById(bookId);
                     if (selectedBook != null)
-                    {
                         DisplayBookInfo(selectedBook);
-                    }
                 }
             }
         }
 
-        #endregion
-
-        #region Вспомогательные методы
-
-        /// <summary>
-        /// Обновление списка шкафов в комбобоксе
-        /// </summary>
         private void UpdateShelfComboBox()
         {
             shelfSelectCmb.Items.Clear();
@@ -536,13 +436,9 @@ namespace BookShop
                 shelfSelectCmb.SelectedIndex = 0;
         }
 
-        /// <summary>
-        /// Получение выбранного шкафа
-        /// </summary>
         private BookShelf GetSelectedBookShelf()
         {
-            if (shelfSelectCmb.SelectedItem == null)
-                return null;
+            if (shelfSelectCmb.SelectedItem == null) return null;
 
             string selectedShelf = shelfSelectCmb.SelectedItem.ToString();
             int shelfId = ExtractShelfId(selectedShelf);
@@ -550,9 +446,6 @@ namespace BookShop
             return bookShelves.FirstOrDefault(s => s.Id == shelfId);
         }
 
-        /// <summary>
-        /// Очистка полей для новой книги
-        /// </summary>
         private void ClearNewBookFields()
         {
             bookNameField.Clear();
@@ -562,53 +455,35 @@ namespace BookShop
             priceNumbericUpDown.Value = priceNumbericUpDown.Minimum;
         }
 
-        /// <summary>
-        /// Обновление списка книг в выбранном шкафу
-        /// </summary>
         private void UpdateBooksInShelf()
         {
             bookSelectCmb.Items.Clear();
-
             BookShelf selectedShelf = GetSelectedBookShelf();
-
             if (selectedShelf != null)
             {
                 var booksInShelf = selectedShelf.GetAllBooks();
-
                 foreach (var book in booksInShelf)
                 {
                     bookSelectCmb.Items.Add($"{book.Id}: {book.Title} - {book.Author}");
                 }
 
-                // Обновление информации о загруженности шкафа
                 shelfCapacity.Text = $"Загруженность {booksInShelf.Count}/{selectedShelf.Capacity}";
-
-                if (booksInShelf.Count >= selectedShelf.Capacity)
-                {
-                    shelfCapacity.ForeColor = Color.Red;
-                }
-                else
-                {
-                    shelfCapacity.ForeColor = Color.Black;
-                }
+                shelfCapacity.ForeColor = booksInShelf.Count >= selectedShelf.Capacity ? Color.Red : Color.Black;
             }
         }
 
-        /// <summary>
-        /// Отображение информации о книге
-        /// </summary>
         private void DisplayBookInfo(Book book)
         {
-            bookTitleField.Text = book.Title;
-            bookAuthorField.Text = book.Author;
-            bookIDField.Text = book.Id.ToString();
-            bookPriceField.Text = book.Price.ToString("C");
-            bookPagesCountField.Text = book.Pages.ToString();
+            if (book != null)
+            {
+                bookTitleField.Text = book.Title;
+                bookAuthorField.Text = book.Author;
+                bookIDField.Text = book.Id.ToString();
+                bookPriceField.Text = book.Price.ToString("C");
+                bookPagesCountField.Text = book.Pages.ToString();
+            }
         }
 
-        /// <summary>
-        /// Очистка информации о книге
-        /// </summary>
         private void ClearBookInfo()
         {
             bookTitleField.Clear();
@@ -618,20 +493,12 @@ namespace BookShop
             bookPagesCountField.Clear();
         }
 
-        /// <summary>
-        /// Обновление отображения баланса
-        /// </summary>
         private void UpdateBalanceDisplay()
         {
             if (shop != null)
-            {
                 balanceLb.Text = $"Баланс: {shop.Balance:C}";
-            }
         }
 
-        /// <summary>
-        /// Извлечение ID книги из строки комбобокса
-        /// </summary>
         private int ExtractBookId(string bookInfo)
         {
             if (string.IsNullOrEmpty(bookInfo)) return 0;
@@ -639,14 +506,10 @@ namespace BookShop
             return int.TryParse(parts[0], out int id) ? id : 0;
         }
 
-        /// <summary>
-        /// Извлечение ID шкафа из строки комбобокса
-        /// </summary>
         private int ExtractShelfId(string shelfInfo)
         {
             if (string.IsNullOrEmpty(shelfInfo)) return 0;
 
-            // Формат: "Шкаф 1 (Детектив)"
             int startIndex = shelfInfo.IndexOf(' ') + 1;
             int endIndex = shelfInfo.IndexOf(' ', startIndex);
 
@@ -658,22 +521,5 @@ namespace BookShop
 
             return 0;
         }
-
-        /// <summary>
-        /// Выбор шкафа по книге
-        /// </summary>
-        private void SelectShelfByBook(Book book)
-        {
-            for (int i = 0; i < bookShelves.Count; i++)
-            {
-                if (bookShelves[i].GetAllBooks().Any(b => b.Id == book.Id))
-                {
-                    shelfSelectCmb.SelectedIndex = i;
-                    break;
-                }
-            }
-        }
-
-        #endregion
     }
 }

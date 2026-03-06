@@ -511,7 +511,7 @@ namespace BookShop
             // authorField
             // 
             authorField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            authorField.Location = new Point(211, 116);
+            authorField.Location = new Point(211, 130);
             authorField.Margin = new Padding(17, 4, 3, 4);
             authorField.MaximumSize = new Size(1142, 4);
             authorField.Name = "authorField";
@@ -521,7 +521,7 @@ namespace BookShop
             // bookNameField
             // 
             bookNameField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            bookNameField.Location = new Point(211, 63);
+            bookNameField.Location = new Point(211, 77);
             bookNameField.Margin = new Padding(17, 4, 3, 4);
             bookNameField.MaximumSize = new Size(1142, 4);
             bookNameField.Name = "bookNameField";
@@ -598,7 +598,7 @@ namespace BookShop
             ganreComboBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             ganreComboBox.FormattingEnabled = true;
             ganreComboBox.Items.AddRange(new object[] { "Роман", "Повесть", "Рассказ", "Проза", "Эпос", "Лирика", "Драма", "Фантастика", "Фэнтези", "Детектив", "Триллер", "Любовный роман", "Биография", "Психология", "Научно-популярная литература" });
-            ganreComboBox.Location = new Point(211, 171);
+            ganreComboBox.Location = new Point(211, 169);
             ganreComboBox.Margin = new Padding(17, 4, 3, 4);
             ganreComboBox.MaximumSize = new Size(1142, 0);
             ganreComboBox.Name = "ganreComboBox";

@@ -54,6 +54,9 @@ namespace BookShopLibrary
         /// <exception cref="InvalidOperationException">Если жанр книги не соответствует жанру шкафа</exception>
         public bool AddBook(Book book)
         {
+            if (book == null)
+                throw new ArgumentNullException(nameof(book));
+
             if (book.Genre != Genre)
                 throw new InvalidOperationException($"Жанр книги '{book.Genre}' не соответствует жанру шкафа '{Genre}'");
 
@@ -86,6 +89,9 @@ namespace BookShopLibrary
         /// <returns>Найденная книга или null</returns>
         public Book FindBookByTitle(string title)
         {
+            if (string.IsNullOrWhiteSpace(title))
+                return null;
+
             return books.FirstOrDefault(b => b.Title.Equals(title, StringComparison.OrdinalIgnoreCase));
         }
 
@@ -109,16 +115,53 @@ namespace BookShopLibrary
         }
 
         /// <summary>
+        /// Продажа книги из шкафа
+        /// </summary>
+        /// <param name="bookId">ID продаваемой книги</param>
+        /// <returns>Цена проданной книги</returns>
+        /// <exception cref="InvalidOperationException">Если книга не найдена</exception>
+        public decimal SellBook(int bookId)
+        {
+            var book = FindBookById(bookId);
+            if (book == null)
+                throw new InvalidOperationException("Книга не найдена в шкафу");
+
+            books.Remove(book);
+            return book.Sell();
+        }
+
+        /// <summary>
         /// Изменение жанра шкафа (только для пустого шкафа)
         /// </summary>
         /// <param name="newGenre">Новый жанр</param>
         /// <exception cref="InvalidOperationException">Если шкаф не пуст</exception>
         public void ChangeGenre(string newGenre)
         {
+            if (string.IsNullOrWhiteSpace(newGenre))
+                throw new ArgumentException("Жанр не может быть пустым", nameof(newGenre));
+
             if (books.Count > 0)
-                throw new InvalidOperationException("Нельзя изменить жанр непустого шкафа");
+                throw new InvalidOperationException("Нельзя изменить жанр непустого шкафа. Сначала продайте все книги.");
 
             Genre = newGenre;
+        }
+
+        /// <summary>
+        /// Проверка, пуст ли шкаф
+        /// </summary>
+        public bool IsEmpty => books.Count == 0;
+
+        /// <summary>
+        /// Проверка, есть ли свободное место
+        /// </summary>
+        public bool HasFreeSpace => books.Count < Capacity;
+
+        /// <summary>
+        /// Переопределение ToString для отображения в интерфейсе
+        /// </summary>
+        public override string ToString()
+        {
+            return $"Шкаф {Id} ({Genre}) - {CurrentCount}/{Capacity}";
         }
     }
 }
