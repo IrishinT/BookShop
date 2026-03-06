@@ -149,10 +149,10 @@ namespace BookShop
             bookPagesCountField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             bookPagesCountField.Location = new Point(166, 308);
             bookPagesCountField.Margin = new Padding(17, 4, 17, 4);
-            bookPagesCountField.MaximumSize = new Size(228, 4);
+            bookPagesCountField.MaximumSize = new Size(228, 32);
             bookPagesCountField.Name = "bookPagesCountField";
             bookPagesCountField.ReadOnly = true;
-            bookPagesCountField.Size = new Size(228, 4);
+            bookPagesCountField.Size = new Size(228, 32);
             bookPagesCountField.TabIndex = 10;
             // 
             // bookPagesCountLb
@@ -171,10 +171,10 @@ namespace BookShop
             bookPriceField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             bookPriceField.Location = new Point(166, 236);
             bookPriceField.Margin = new Padding(17, 4, 17, 4);
-            bookPriceField.MaximumSize = new Size(228, 4);
+            bookPriceField.MaximumSize = new Size(228, 32);
             bookPriceField.Name = "bookPriceField";
             bookPriceField.ReadOnly = true;
-            bookPriceField.Size = new Size(228, 4);
+            bookPriceField.Size = new Size(228, 32);
             bookPriceField.TabIndex = 8;
             // 
             // bookPriceLb
@@ -193,10 +193,10 @@ namespace BookShop
             bookIDField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             bookIDField.Location = new Point(166, 164);
             bookIDField.Margin = new Padding(17, 4, 17, 4);
-            bookIDField.MaximumSize = new Size(228, 4);
+            bookIDField.MaximumSize = new Size(228, 32);
             bookIDField.Name = "bookIDField";
             bookIDField.ReadOnly = true;
-            bookIDField.Size = new Size(228, 4);
+            bookIDField.Size = new Size(228, 32);
             bookIDField.TabIndex = 6;
             // 
             // bookIDLb
@@ -213,12 +213,12 @@ namespace BookShop
             // bookAuthorField
             // 
             bookAuthorField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            bookAuthorField.Location = new Point(166, 106);
+            bookAuthorField.Location = new Point(166, 92);
             bookAuthorField.Margin = new Padding(17, 4, 17, 4);
-            bookAuthorField.MaximumSize = new Size(799, 4);
+            bookAuthorField.MaximumSize = new Size(799, 32);
             bookAuthorField.Name = "bookAuthorField";
             bookAuthorField.ReadOnly = true;
-            bookAuthorField.Size = new Size(327, 4);
+            bookAuthorField.Size = new Size(327, 32);
             bookAuthorField.TabIndex = 4;
             // 
             // bookAuthorLb
@@ -246,12 +246,12 @@ namespace BookShop
             // bookTitleField
             // 
             bookTitleField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            bookTitleField.Location = new Point(166, 34);
+            bookTitleField.Location = new Point(166, 20);
             bookTitleField.Margin = new Padding(17, 4, 17, 4);
-            bookTitleField.MaximumSize = new Size(799, 4);
+            bookTitleField.MaximumSize = new Size(799, 32);
             bookTitleField.Name = "bookTitleField";
             bookTitleField.ReadOnly = true;
-            bookTitleField.Size = new Size(327, 4);
+            bookTitleField.Size = new Size(327, 32);
             bookTitleField.TabIndex = 2;
             // 
             // bookSellBtn
@@ -511,21 +511,21 @@ namespace BookShop
             // authorField
             // 
             authorField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            authorField.Location = new Point(211, 130);
+            authorField.Location = new Point(211, 116);
             authorField.Margin = new Padding(17, 4, 3, 4);
-            authorField.MaximumSize = new Size(1142, 4);
+            authorField.MaximumSize = new Size(1142, 32);
             authorField.Name = "authorField";
-            authorField.Size = new Size(663, 4);
+            authorField.Size = new Size(663, 32);
             authorField.TabIndex = 3;
             // 
             // bookNameField
             // 
             bookNameField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            bookNameField.Location = new Point(211, 77);
+            bookNameField.Location = new Point(211, 63);
             bookNameField.Margin = new Padding(17, 4, 3, 4);
-            bookNameField.MaximumSize = new Size(1142, 4);
+            bookNameField.MaximumSize = new Size(1142, 32);
             bookNameField.Name = "bookNameField";
-            bookNameField.Size = new Size(663, 4);
+            bookNameField.Size = new Size(663, 32);
             bookNameField.TabIndex = 0;
             // 
             // bookNameLabel

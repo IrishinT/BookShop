@@ -8,6 +8,10 @@ using BookShopLibrary;
 
 namespace BookShop
 {
+    /// <summary>
+    /// Главная форма приложения "Книжный магазин".
+    /// Предоставляет интерфейс для управления книгами, шкафами и продажами.
+    /// </summary>
     public partial class BookStoreForm : Form
     {
         private Shop shop;
@@ -17,6 +21,9 @@ namespace BookShop
         private readonly string authorsFile = "authors.txt";
         private readonly string genresFile = "genres.txt";
 
+        /// <summary>
+        /// Конструктор формы. Инициализирует магазин, элементы управления и загружает данные.
+        /// </summary>
         public BookStoreForm()
         {
             InitializeComponent();
@@ -31,6 +38,9 @@ namespace BookShop
             LoadGenresFromFile();
         }
 
+        /// <summary>
+        /// Подписывает элементы управления на обработчики событий.
+        /// </summary>
         private void SubscribeToEvents()
         {
             createBookBtn.Click += CreateBookBtn_Click;
@@ -46,8 +56,14 @@ namespace BookShop
             authorField.KeyPress += TextBox_KeyPress;
         }
 
+        /// <summary>
+        /// Пустой обработчик события Paint для панели информации о книге.
+        /// </summary>
         private void bookInfoLayoutPanel_Paint(object sender, PaintEventArgs e) { }
 
+        /// <summary>
+        /// Инициализирует объект магазина и список шкафов.
+        /// </summary>
         private void InitializeShop()
         {
             try
@@ -62,6 +78,9 @@ namespace BookShop
             }
         }
 
+        /// <summary>
+        /// Настраивает начальные значения элементов управления формы (NumericUpDown, поля ID и баланса).
+        /// </summary>
         private void InitializeFormControls()
         {
             pagesCountNumbericUpDown.Minimum = 1;
@@ -77,6 +96,9 @@ namespace BookShop
             UpdateBalanceDisplay();
         }
 
+        /// <summary>
+        /// Создаёт файлы с данными (названия, авторы, жанры), если они не существуют.
+        /// </summary>
         private void CreateDataFilesIfNotExist()
         {
             try
@@ -84,28 +106,28 @@ namespace BookShop
                 if (!File.Exists(titlesFile))
                 {
                     File.WriteAllLines(titlesFile, new string[] {
-                        "Война и мир", "Преступление и наказание", "Анна Каренина",
-                        "Мастер и Маргарита", "Идиот", "Отцы и дети", "Обломов",
-                        "Герой нашего времени", "Мертвые души", "Тихий Дон"
+                        "Тайна в тумане", "Путешествие в неизвестность", "Мир приключений",
+                        "Сердце в опасности", "Звёзды", "Путь к мечте", "Легенда",
+                        "Хранитель древних знаний", "Загадочный остров", "Время любви"
                     });
                 }
 
                 if (!File.Exists(authorsFile))
                 {
                     File.WriteAllLines(authorsFile, new string[] {
-                        "Лев Толстой", "Федор Достоевский", "Михаил Булгаков",
-                        "Иван Тургенев", "Иван Гончаров", "Михаил Лермонтов",
-                        "Николай Гоголь", "Михаил Шолохов", "Антон Чехов",
-                        "Александр Пушкин"
+                        "Иван Петров", "Мария Соколова", "Алексей Волков",
+                        "Елена Морозова", "Дмитрий Козлов", "Анна Лебедева",
+                        "Сергей Новиков", "Ольга Смирнова", "Павел Орлов",
+                        "Екатерина Васильева"
                     });
                 }
 
                 if (!File.Exists(genresFile))
                 {
                     File.WriteAllLines(genresFile, new string[] {
-                        "Роман", "Фантастика", "Детектив", "Приключения",
-                        "Поэзия", "Драма", "Триллер", "Фэнтези",
-                        "Биография", "Научная литература"
+                        "Роман", "Повесть", "Рассказ", "Проза", "Эпос",
+                        "Лирика", "Драма", "Фантастика", "Фэнтези", "Детектив",
+                        "Триллер", "Любовный роман", "Биография", "Психология", "Научно-популярная литература"
                     });
                 }
             }
@@ -115,6 +137,9 @@ namespace BookShop
             }
         }
 
+        /// <summary>
+        /// Загружает список жанров из файла в ComboBox.
+        /// </summary>
         private void LoadGenresFromFile()
         {
             try
@@ -138,6 +163,10 @@ namespace BookShop
             }
         }
 
+        /// <summary>
+        /// Проверяет заполненность всех обязательных полей для создания книги.
+        /// </summary>
+        /// <returns>True если все поля заполнены корректно, иначе False.</returns>
         private bool ValidateBookFields()
         {
             if (string.IsNullOrWhiteSpace(bookNameField.Text))
@@ -166,13 +195,16 @@ namespace BookShop
 
             if (priceNumbericUpDown.Value <= 0)
             {
-                MessageBox.Show("Цена должна быть больше 0", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Цена книги должна быть больше 0", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
             return true;
         }
 
+        /// <summary>
+        /// Обработчик нажатия клавиш в текстовых полях. Запрещает ввод цифр в поля текста.
+        /// </summary>
         private void TextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (char.IsDigit(e.KeyChar))
@@ -182,6 +214,9 @@ namespace BookShop
             }
         }
 
+        /// <summary>
+        /// Обработчик нажатия клавиш в поле поиска. Разрешает только цифры при поиске по ID.
+        /// </summary>
         private void SearchField_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (searchTypeCmb.SelectedIndex == 1)
@@ -193,6 +228,32 @@ namespace BookShop
             }
         }
 
+        /// <summary>
+        /// Проверяет существование книги с таким названием во всём магазине 
+        /// и при необходимости добавляет суффикс (2, 3, 4...) для уникальности.
+        /// </summary>
+        /// <param name="baseTitle">Исходное название книги</param>
+        /// <returns>Уникальное название книги</returns>
+        private string GetUniqueTitle(string baseTitle)
+        {
+            string uniqueTitle = baseTitle;
+            int suffix = 2;
+
+            // Проверяем все книги во всех шкафах магазина
+            while (bookShelves.Any(shelf =>
+                shelf.GetAllBooks().Any(b =>
+                    b.Title.Equals(uniqueTitle, StringComparison.OrdinalIgnoreCase))))
+            {
+                uniqueTitle = $"{baseTitle} {suffix}";
+                suffix++;
+            }
+
+            return uniqueTitle;
+        }
+
+        /// <summary>
+        /// Обработчик кнопки создания книги. Добавляет книгу в соответствующий шкаф.
+        /// </summary>
         private void CreateBookBtn_Click(object sender, EventArgs e)
         {
             try
@@ -200,6 +261,15 @@ namespace BookShop
                 if (!ValidateBookFields()) return;
 
                 string selectedGenre = ganreComboBox.SelectedItem.ToString();
+
+                // Проверка на дубликаты названия
+                string baseTitle = bookNameField.Text.Trim();
+                string uniqueTitle = GetUniqueTitle(baseTitle);
+                if (uniqueTitle != baseTitle)
+                {
+                    bookNameField.Text = uniqueTitle; // Обновляем поле для отображения
+                }
+
                 BookShelf targetShelf = bookShelves.FirstOrDefault(s =>
                     s.Genre == selectedGenre && s.CurrentCount < s.Capacity);
 
@@ -224,20 +294,20 @@ namespace BookShop
                     }
                     else
                     {
-                        MessageBox.Show("Нет доступных шкафов. Достигнут максимальный лимит.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("Все шкафы заняты. Освободите место для нового жанра.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return;
                     }
                 }
 
                 if (targetShelf.CurrentCount >= targetShelf.Capacity)
                 {
-                    MessageBox.Show($"В шкафу нет места! Максимальная вместимость: {targetShelf.Capacity}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show($"Шкаф переполнен! Максимум: {targetShelf.Capacity}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
                 Book newBook = new Book(
                     nextId,
-                    bookNameField.Text.Trim(),
+                    uniqueTitle, // Используем уникальное название
                     authorField.Text.Trim(),
                     selectedGenre,
                     (int)pagesCountNumbericUpDown.Value,
@@ -253,7 +323,7 @@ namespace BookShop
                     UpdateShelfComboBox();
                     UpdateBooksInShelf();
 
-                    MessageBox.Show($"Книга '{newBook.Title}' успешно создана!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show($"Книга '{newBook.Title}' успешно добавлена!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (InvalidOperationException ex)
@@ -266,11 +336,17 @@ namespace BookShop
             }
         }
 
+        /// <summary>
+        /// Обработчик кнопки генерации случайной книги. Заполняет поля случайными данными.
+        /// </summary>
         private void GenerateBookBtn_Click(object sender, EventArgs e)
         {
             try
             {
                 Book generatedBook = Book.GenerateRandom(nextId);
+
+                // Проверка на дубликаты для сгенерированного названия
+                generatedBook.Title = GetUniqueTitle(generatedBook.Title);
 
                 bookNameField.Text = generatedBook.Title;
                 authorField.Text = generatedBook.Author;
@@ -293,7 +369,11 @@ namespace BookShop
             }
         }
 
-        // ===== Исправленный метод поиска книги =====
+        // ===== Обработчики вкладки "Магазин" =====
+
+        /// <summary>
+        /// Обработчик кнопки поиска книги по названию или ID.
+        /// </summary>
         private void SearchBtn_Click(object sender, EventArgs e)
         {
             try
@@ -360,6 +440,9 @@ namespace BookShop
             }
         }
 
+        /// <summary>
+        /// Обработчик кнопки продажи книги. Удаляет книгу из шкафа и добавляет деньги в баланс.
+        /// </summary>
         private void BookSellBtn_Click(object sender, EventArgs e)
         {
             try
@@ -405,8 +488,14 @@ namespace BookShop
             }
         }
 
+        /// <summary>
+        /// Обработчик изменения выбранного шкафа. Обновляет список книг в шкафу.
+        /// </summary>
         private void ShelfSelectCmb_SelectedIndexChanged(object sender, EventArgs e) => UpdateBooksInShelf();
 
+        /// <summary>
+        /// Обработчик изменения выбранной книги. Отображает информацию о книге.
+        /// </summary>
         private void BookSelectCmb_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (bookSelectCmb.SelectedItem != null)
@@ -424,6 +513,9 @@ namespace BookShop
             }
         }
 
+        /// <summary>
+        /// Обновляет список шкафов в ComboBox.
+        /// </summary>
         private void UpdateShelfComboBox()
         {
             shelfSelectCmb.Items.Clear();
@@ -436,6 +528,10 @@ namespace BookShop
                 shelfSelectCmb.SelectedIndex = 0;
         }
 
+        /// <summary>
+        /// Возвращает выбранный шкаф из ComboBox.
+        /// </summary>
+        /// <returns>Объект BookShelf или null если ничего не выбрано.</returns>
         private BookShelf GetSelectedBookShelf()
         {
             if (shelfSelectCmb.SelectedItem == null) return null;
@@ -446,6 +542,9 @@ namespace BookShop
             return bookShelves.FirstOrDefault(s => s.Id == shelfId);
         }
 
+        /// <summary>
+        /// Очищает все поля на вкладке "Новая книга".
+        /// </summary>
         private void ClearNewBookFields()
         {
             bookNameField.Clear();
@@ -455,6 +554,9 @@ namespace BookShop
             priceNumbericUpDown.Value = priceNumbericUpDown.Minimum;
         }
 
+        /// <summary>
+        /// Обновляет список книг в выбранном шкафу и отображает загруженность.
+        /// </summary>
         private void UpdateBooksInShelf()
         {
             bookSelectCmb.Items.Clear();
@@ -472,6 +574,10 @@ namespace BookShop
             }
         }
 
+        /// <summary>
+        /// Отображает информацию о книге в полях на вкладке "Магазин".
+        /// </summary>
+        /// <param name="book">Книга для отображения</param>
         private void DisplayBookInfo(Book book)
         {
             if (book != null)
@@ -484,6 +590,9 @@ namespace BookShop
             }
         }
 
+        /// <summary>
+        /// Очищает поля информации о книге на вкладке "Магазин".
+        /// </summary>
         private void ClearBookInfo()
         {
             bookTitleField.Clear();
@@ -493,12 +602,20 @@ namespace BookShop
             bookPagesCountField.Clear();
         }
 
+        /// <summary>
+        /// Обновляет отображение баланса магазина.
+        /// </summary>
         private void UpdateBalanceDisplay()
         {
             if (shop != null)
                 balanceLb.Text = $"Баланс: {shop.Balance:C}";
         }
 
+        /// <summary>
+        /// Извлекает ID книги из строки отображения в ComboBox.
+        /// </summary>
+        /// <param name="bookInfo">Строка формата "ID: Название - Автор"</param>
+        /// <returns>ID книги или 0 если не удалось извлечь</returns>
         private int ExtractBookId(string bookInfo)
         {
             if (string.IsNullOrEmpty(bookInfo)) return 0;
@@ -506,6 +623,11 @@ namespace BookShop
             return int.TryParse(parts[0], out int id) ? id : 0;
         }
 
+        /// <summary>
+        /// Извлекает ID шкафа из строки отображения в ComboBox.
+        /// </summary>
+        /// <param name="shelfInfo">Строка формата "Шкаф ID (Жанр)"</param>
+        /// <returns>ID шкафа или 0 если не удалось извлечь</returns>
         private int ExtractShelfId(string shelfInfo)
         {
             if (string.IsNullOrEmpty(shelfInfo)) return 0;
