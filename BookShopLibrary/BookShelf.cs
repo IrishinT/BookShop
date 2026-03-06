@@ -106,12 +106,12 @@ namespace BookShopLibrary
         }
 
         /// <summary>
-        /// Получение всех книг в шкафу
+        /// Получение всех книг в шкафу, отсортированных по ID
         /// </summary>
-        /// <returns>Список книг</returns>
+        /// <returns>Список книг, отсортированный по идентификационному номеру</returns>
         public List<Book> GetAllBooks()
         {
-            return books.ToList();
+            return books.OrderBy(b => b.Id).ToList();
         }
 
         /// <summary>

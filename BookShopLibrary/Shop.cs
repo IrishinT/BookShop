@@ -185,6 +185,9 @@ namespace BookShopLibrary
             if (book == null)
                 throw new ArgumentNullException(nameof(book));
 
+            // Проверка на дубликаты названий и добавление индекса при необходимости
+            EnsureUniqueTitle(book);
+
             // 1. Поиск шкафа с подходящим жанром и свободным местом
             var targetShelf = shelves.FirstOrDefault(s =>
                 s.Genre == book.Genre && s.HasFreeSpace);
@@ -211,6 +214,24 @@ namespace BookShopLibrary
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Проверяет уникальность названия книги и добавляет числовой индекс при необходимости
+        /// </summary>
+        /// <param name="book">Книга для проверки</param>
+        private void EnsureUniqueTitle(Book book)
+        {
+            string originalTitle = book.Title;
+            int index = 2;
+
+            // Проверяем, существует ли книга с таким названием
+            while (FindBookByTitle(book.Title) != null)
+            {
+                // Если название уже существует, добавляем индекс
+                book.Title = $"{originalTitle} {index}";
+                index++;
+            }
         }
     }
 }
