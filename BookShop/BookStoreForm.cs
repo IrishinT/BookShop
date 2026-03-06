@@ -1,11 +1,10 @@
-using BookShopLibrary;
-using BookStore.Library; // Пространство имен библиотеки классов
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using BookShopLibrary;
 
 namespace BookShop
 {
@@ -13,7 +12,7 @@ namespace BookShop
     {
         // Ссылки на объекты библиотеки классов
         private Shop shop;
-        private List<Bookcase> bookcases;
+        private List<BookShelf> bookShelves;
         private int nextId = 1;
 
         // Пути к файлам с данными для генерации
@@ -60,6 +59,27 @@ namespace BookShop
             searchField.KeyPress += SearchField_KeyPress;
             bookNameField.KeyPress += TextBox_KeyPress;
             authorField.KeyPress += TextBox_KeyPress;
+
+            // Обработка события Paint для панели информации о книге
+            bookInfoLayoutPanel.Paint += bookInfoLayoutPanel_Paint;
+        }
+
+        /// <summary>
+        /// Обработчик события Paint для панели информации о книге
+        /// </summary>
+        private void bookInfoLayoutPanel_Paint(object sender, PaintEventArgs e)
+        {
+            // Здесь можно добавить код для рисования на панели, если нужно
+            // Например, можно нарисовать рамку или фон
+            Control panel = sender as Control;
+            if (panel != null)
+            {
+                // Рисуем простую рамку вокруг панели
+                using (Pen pen = new Pen(Color.FromArgb(200, 200, 200), 1))
+                {
+                    e.Graphics.DrawRectangle(pen, 0, 0, panel.Width - 1, panel.Height - 1);
+                }
+            }
         }
 
         /// <summary>
@@ -73,17 +93,17 @@ namespace BookShop
                 shop = new Shop(0, 5);
 
                 // Создаем несколько шкафов
-                bookcases = new List<Bookcase>
+                bookShelves = new List<BookShelf>
                 {
-                    new Bookcase(1, "Детектив", 10),
-                    new Bookcase(2, "Фантастика", 10),
-                    new Bookcase(3, "Роман", 10)
+                    new BookShelf(1, "Детектив", 10),
+                    new BookShelf(2, "Фантастика", 10),
+                    new BookShelf(3, "Роман", 10)
                 };
 
                 // Добавляем шкафы в магазин
-                foreach (var bookcase in bookcases)
+                foreach (var shelf in bookShelves)
                 {
-                    shop.AddBookcase(bookcase);
+                    shop.AddBookShelf(shelf);
                 }
 
                 // Заполняем комбобокс шкафов
@@ -233,18 +253,36 @@ namespace BookShop
                 }
 
                 // Получаем выбранный шкаф
-                Bookcase selectedBookcase = GetSelectedBookcase();
-                if (selectedBookcase == null)
+                BookShelf selectedShelf = GetSelectedBookShelf();
+                if (selectedShelf == null)
                 {
                     MessageBox.Show("Выберите шкаф для книги", "Ошибка",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                // Проверяем, есть ли место в шкафу
-                if (selectedBookcase.CurrentCount >= selectedBookcase.Capacity)
+                // Проверяем жанр книги и шкафа
+                string selectedGenre = ganreComboBox.SelectedItem.ToString();
+                if (selectedShelf.Genre != selectedGenre)
                 {
-                    MessageBox.Show($"В шкафу нет места! Максимальная вместимость: {selectedBookcase.Capacity}",
+                    // Проверяем, пуст ли шкаф (можно сменить жанр)
+                    if (selectedShelf.CurrentCount == 0)
+                    {
+                        // Меняем жанр пустого шкафа
+                        selectedShelf.ChangeGenre(selectedGenre);
+                    }
+                    else
+                    {
+                        MessageBox.Show($"В этот шкаф можно ставить только книги жанра '{selectedShelf.Genre}'",
+                            "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                }
+
+                // Проверяем, есть ли место в шкафу
+                if (selectedShelf.CurrentCount >= selectedShelf.Capacity)
+                {
+                    MessageBox.Show($"В шкафу нет места! Максимальная вместимость: {selectedShelf.Capacity}",
                         "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
@@ -254,13 +292,13 @@ namespace BookShop
                     nextId,
                     bookNameField.Text.Trim(),
                     authorField.Text.Trim(),
-                    ganreComboBox.SelectedItem.ToString(),
+                    selectedGenre,
                     (int)pagesCountNumbericUpDown.Value,
                     priceNumbericUpDown.Value
                 );
 
                 // Добавление книги в шкаф через библиотеку
-                if (selectedBookcase.AddBook(newBook))
+                if (selectedShelf.AddBook(newBook))
                 {
                     nextId++;
                     idField.Text = nextId.ToString();
@@ -268,8 +306,9 @@ namespace BookShop
                     // Очистка полей для новой книги
                     ClearNewBookFields();
 
-                    // Обновление списка книг
+                    // Обновление списка книг и названия шкафа
                     UpdateBooksInShelf();
+                    UpdateShelfComboBox();
 
                     MessageBox.Show($"Книга '{newBook.Title}' успешно создана!",
                         "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -298,7 +337,7 @@ namespace BookShop
                 string[] authors = File.ReadAllLines(authorsFile);
 
                 // Получаем все книги из всех шкафов для проверки уникальности
-                var allBooks = bookcases.SelectMany(bc => bc.GetAllBooks()).ToList();
+                var allBooks = bookShelves.SelectMany(s => s.GetAllBooks()).ToList();
 
                 // Проверка на уникальность названия
                 string generatedTitle = titles[rand.Next(titles.Length)];
@@ -348,9 +387,9 @@ namespace BookShop
                 if (searchTypeCmb.SelectedIndex == 0) // Поиск по названию
                 {
                     // Ищем книгу во всех шкафах
-                    foreach (var bookcase in bookcases)
+                    foreach (var shelf in bookShelves)
                     {
-                        foundBook = bookcase.FindBookByTitle(searchText);
+                        foundBook = shelf.FindBookByTitle(searchText);
                         if (foundBook != null)
                             break;
                     }
@@ -360,9 +399,9 @@ namespace BookShop
                     if (int.TryParse(searchText, out int id))
                     {
                         // Ищем книгу во всех шкафах
-                        foreach (var bookcase in bookcases)
+                        foreach (var shelf in bookShelves)
                         {
-                            foundBook = bookcase.FindBookById(id);
+                            foundBook = shelf.FindBookById(id);
                             if (foundBook != null)
                                 break;
                         }
@@ -411,23 +450,23 @@ namespace BookShop
                 int bookId = ExtractBookId(selectedBookInfo);
 
                 // Находим шкаф с этой книгой
-                Bookcase targetBookcase = null;
+                BookShelf targetShelf = null;
                 Book bookToSell = null;
 
-                foreach (var bookcase in bookcases)
+                foreach (var shelf in bookShelves)
                 {
-                    bookToSell = bookcase.FindBookById(bookId);
+                    bookToSell = shelf.FindBookById(bookId);
                     if (bookToSell != null)
                     {
-                        targetBookcase = bookcase;
+                        targetShelf = shelf;
                         break;
                     }
                 }
 
-                if (bookToSell != null && targetBookcase != null)
+                if (bookToSell != null && targetShelf != null)
                 {
                     // Продажа через библиотеку
-                    if (targetBookcase.RemoveBook(bookId))
+                    if (targetShelf.RemoveBook(bookId))
                     {
                         // Увеличиваем баланс магазина
                         shop.AddToBalance(bookToSell.Price);
@@ -466,10 +505,10 @@ namespace BookShop
                 int bookId = ExtractBookId(selectedBookInfo);
 
                 // Ищем книгу в текущем шкафу
-                Bookcase selectedBookcase = GetSelectedBookcase();
-                if (selectedBookcase != null)
+                BookShelf selectedShelf = GetSelectedBookShelf();
+                if (selectedShelf != null)
                 {
-                    Book selectedBook = selectedBookcase.FindBookById(bookId);
+                    Book selectedBook = selectedShelf.FindBookById(bookId);
                     if (selectedBook != null)
                     {
                         DisplayBookInfo(selectedBook);
@@ -488,9 +527,9 @@ namespace BookShop
         private void UpdateShelfComboBox()
         {
             shelfSelectCmb.Items.Clear();
-            foreach (var bookcase in bookcases)
+            foreach (var shelf in bookShelves)
             {
-                shelfSelectCmb.Items.Add($"Шкаф {bookcase.Id} ({bookcase.Genre})");
+                shelfSelectCmb.Items.Add($"Шкаф {shelf.Id} ({shelf.Genre})");
             }
 
             if (shelfSelectCmb.Items.Count > 0)
@@ -500,7 +539,7 @@ namespace BookShop
         /// <summary>
         /// Получение выбранного шкафа
         /// </summary>
-        private Bookcase GetSelectedBookcase()
+        private BookShelf GetSelectedBookShelf()
         {
             if (shelfSelectCmb.SelectedItem == null)
                 return null;
@@ -508,7 +547,7 @@ namespace BookShop
             string selectedShelf = shelfSelectCmb.SelectedItem.ToString();
             int shelfId = ExtractShelfId(selectedShelf);
 
-            return bookcases.FirstOrDefault(bc => bc.Id == shelfId);
+            return bookShelves.FirstOrDefault(s => s.Id == shelfId);
         }
 
         /// <summary>
@@ -530,11 +569,11 @@ namespace BookShop
         {
             bookSelectCmb.Items.Clear();
 
-            Bookcase selectedBookcase = GetSelectedBookcase();
+            BookShelf selectedShelf = GetSelectedBookShelf();
 
-            if (selectedBookcase != null)
+            if (selectedShelf != null)
             {
-                var booksInShelf = selectedBookcase.GetAllBooks();
+                var booksInShelf = selectedShelf.GetAllBooks();
 
                 foreach (var book in booksInShelf)
                 {
@@ -542,9 +581,9 @@ namespace BookShop
                 }
 
                 // Обновление информации о загруженности шкафа
-                shelfCapacity.Text = $"Загруженность {booksInShelf.Count}/{selectedBookcase.Capacity}";
+                shelfCapacity.Text = $"Загруженность {booksInShelf.Count}/{selectedShelf.Capacity}";
 
-                if (booksInShelf.Count >= selectedBookcase.Capacity)
+                if (booksInShelf.Count >= selectedShelf.Capacity)
                 {
                     shelfCapacity.ForeColor = Color.Red;
                 }
@@ -609,7 +648,7 @@ namespace BookShop
 
             // Формат: "Шкаф 1 (Детектив)"
             int startIndex = shelfInfo.IndexOf(' ') + 1;
-            int endIndex = shelfInfo.IndexOf(' ');
+            int endIndex = shelfInfo.IndexOf(' ', startIndex);
 
             if (startIndex > 0 && endIndex > startIndex)
             {
@@ -625,9 +664,9 @@ namespace BookShop
         /// </summary>
         private void SelectShelfByBook(Book book)
         {
-            for (int i = 0; i < bookcases.Count; i++)
+            for (int i = 0; i < bookShelves.Count; i++)
             {
-                if (bookcases[i].GetAllBooks().Any(b => b.Id == book.Id))
+                if (bookShelves[i].GetAllBooks().Any(b => b.Id == book.Id))
                 {
                     shelfSelectCmb.SelectedIndex = i;
                     break;
