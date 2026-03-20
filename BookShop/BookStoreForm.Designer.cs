@@ -123,7 +123,6 @@ namespace BookShop
             // 
             bookFormTabControl.Controls.Add(shopPage);
             bookFormTabControl.Controls.Add(newBookPage);
-            bookFormTabControl.Controls.Add(deliveriesPage);
             bookFormTabControl.Controls.Add(customersPage);
             bookFormTabControl.Dock = DockStyle.Fill;
             bookFormTabControl.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 204);

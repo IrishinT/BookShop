@@ -100,8 +100,8 @@ namespace BookShopLibrary
                 string genre = genres[random.Next(genres.Count)];
 
                 // Генерация случайных чисел
-                int pages = random.Next(50, 2001);
-                decimal price = random.Next(100, 5001);
+                int pages = random.Next(50, 1001);
+                decimal price = random.Next(100, 1501);
 
                 return new Book(nextId, pair.Title, pair.Author, genre, pages, price);
             }

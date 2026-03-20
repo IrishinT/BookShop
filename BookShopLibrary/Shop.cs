@@ -118,9 +118,6 @@ namespace BookShopLibrary
         /// <param name="amount">Добавляемая сумма</param>
         public void AddToBalance(decimal amount)
         {
-            if (amount < 0)
-                throw new ArgumentException("Сумма не может быть отрицательной", nameof(amount));
-
             Balance += amount;
         }
 
