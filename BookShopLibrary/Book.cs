@@ -94,9 +94,9 @@ namespace BookShopLibrary
         {
             try
             {
-                // Выбираем случайную пару "название-автор"
+                // Выбираем случайную пару "название-автор" из списка
                 var pair = bookAuthorPairs[random.Next(bookAuthorPairs.Count)];
-                // Выбираем случайный жанр
+                // Выбираем случайный жанр из списка
                 string genre = genres[random.Next(genres.Count)];
 
                 // Генерация случайных чисел
@@ -117,11 +117,6 @@ namespace BookShopLibrary
         public override string ToString()
         {
             return $"{Id}: {DisplayTitle} - {Author}";
-        }
-    }
-}
-        {
-            return $"{Id}: {Title} - {Author}";
         }
     }
 }
