@@ -71,9 +71,35 @@ namespace BookShop
             createBookBtn = new Button();
             generateBookBtn = new Button();
             ganreComboBox = new ComboBox();
-            // Новые вкладки
+
+            // ========== Вкладка "Поставки" ==========
             deliveriesPage = new TabPage();
+            deliveriesTablePanel = new TableLayoutPanel();
+            deliveryTitleLb = new Label();
+            deliveryTitleField = new TextBox();
+            deliveryAuthorLb = new Label();
+            deliveryAuthorField = new TextBox();
+            deliveryGenreLb = new Label();
+            deliveryGenreField = new TextBox();
+            deliveryPriceLb = new Label();
+            deliveryPriceField = new TextBox();
+            deliveryPagesLb = new Label();
+            deliveryPagesField = new TextBox();
+            deliveryErrorLb = new Label();
+            deliveryErrorField = new TextBox();
+            deliveryButtonsPanel = new FlowLayoutPanel();
+            btnAcceptDelivery = new Button();
+            btnRejectDelivery = new Button();
+            btnNoticePlagiarism = new Button();
+            btnNoticeMistype = new Button();
+            btnIgnoreError = new Button();
+
+            // ========== Вкладка "Покупатели" ==========
             customersPage = new TabPage();
+            customersMainPanel = new TableLayoutPanel();
+            lblNoCustomers = new Label();
+            customersQueuePanel = new Panel();
+            unsatisfiedLabel = new Label();
 
             bookFormTabControl.SuspendLayout();
             shopPage.SuspendLayout();
@@ -85,6 +111,11 @@ namespace BookShop
             ((System.ComponentModel.ISupportInitialize)priceNumbericUpDown).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pagesCountNumbericUpDown).BeginInit();
             flowLayoutPanel1.SuspendLayout();
+            deliveriesPage.SuspendLayout();
+            deliveriesTablePanel.SuspendLayout();
+            deliveryButtonsPanel.SuspendLayout();
+            customersPage.SuspendLayout();
+            customersMainPanel.SuspendLayout();
             SuspendLayout();
 
             // 
@@ -102,6 +133,7 @@ namespace BookShop
             bookFormTabControl.Size = new Size(800, 450);
             bookFormTabControl.TabIndex = 0;
 
+            // ==================== ВКЛАДКА "МАГАЗИН" ====================
             // 
             // shopPage
             // 
@@ -118,30 +150,6 @@ namespace BookShop
             shopPage.TabIndex = 0;
             shopPage.Text = "Магазин";
             shopPage.UseVisualStyleBackColor = true;
-
-            // 
-            // deliveriesPage
-            // 
-            deliveriesPage.Location = new Point(4, 29);
-            deliveriesPage.Name = "deliveriesPage";
-            deliveriesPage.Padding = new Padding(3);
-            deliveriesPage.Size = new Size(792, 417);
-            deliveriesPage.TabIndex = 2;
-            deliveriesPage.Text = "Поставки";
-            deliveriesPage.Visible = false;
-            deliveriesPage.UseVisualStyleBackColor = true;
-
-            // 
-            // customersPage
-            // 
-            customersPage.Location = new Point(4, 29);
-            customersPage.Name = "customersPage";
-            customersPage.Padding = new Padding(3);
-            customersPage.Size = new Size(792, 417);
-            customersPage.TabIndex = 3;
-            customersPage.Text = "Покупатели";
-            customersPage.Visible = true;
-            customersPage.UseVisualStyleBackColor = true;
 
             // 
             // bookInfoLayoutPanel
@@ -440,6 +448,7 @@ namespace BookShop
             searchBtn.Text = "Поиск";
             searchBtn.UseVisualStyleBackColor = true;
 
+            // ==================== ВКЛАДКА "ЗАКАЗАТЬ КНИГУ" ====================
             // 
             // newBookPage
             // 
@@ -666,6 +675,347 @@ namespace BookShop
             ganreComboBox.Size = new Size(578, 28);
             ganreComboBox.TabIndex = 5;
 
+            // ==================== ВКЛАДКА "ПОСТАВКИ" ====================
+            // 
+            // deliveriesPage
+            // 
+            deliveriesPage.Controls.Add(deliveriesTablePanel);
+            deliveriesPage.Location = new Point(4, 29);
+            deliveriesPage.Name = "deliveriesPage";
+            deliveriesPage.Padding = new Padding(3);
+            deliveriesPage.Size = new Size(792, 417);
+            deliveriesPage.TabIndex = 2;
+            deliveriesPage.Text = "Поставки";
+            deliveriesPage.Visible = false;
+            deliveriesPage.UseVisualStyleBackColor = true;
+
+            // 
+            // deliveriesTablePanel
+            // 
+            deliveriesTablePanel.ColumnCount = 2;
+            deliveriesTablePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 150F));
+            deliveriesTablePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            deliveriesTablePanel.Controls.Add(deliveryTitleLb, 0, 0);
+            deliveriesTablePanel.Controls.Add(deliveryTitleField, 1, 0);
+            deliveriesTablePanel.Controls.Add(deliveryAuthorLb, 0, 1);
+            deliveriesTablePanel.Controls.Add(deliveryAuthorField, 1, 1);
+            deliveriesTablePanel.Controls.Add(deliveryGenreLb, 0, 2);
+            deliveriesTablePanel.Controls.Add(deliveryGenreField, 1, 2);
+            deliveriesTablePanel.Controls.Add(deliveryPriceLb, 0, 3);
+            deliveriesTablePanel.Controls.Add(deliveryPriceField, 1, 3);
+            deliveriesTablePanel.Controls.Add(deliveryPagesLb, 0, 4);
+            deliveriesTablePanel.Controls.Add(deliveryPagesField, 1, 4);
+            deliveriesTablePanel.Controls.Add(deliveryErrorLb, 0, 5);
+            deliveriesTablePanel.Controls.Add(deliveryErrorField, 1, 5);
+            deliveriesTablePanel.Controls.Add(deliveryButtonsPanel, 1, 6);
+            deliveriesTablePanel.Dock = DockStyle.Fill;
+            deliveriesTablePanel.Location = new Point(3, 3);
+            deliveriesTablePanel.Name = "deliveriesTablePanel";
+            deliveriesTablePanel.Padding = new Padding(20);
+            deliveriesTablePanel.RowCount = 7;
+            deliveriesTablePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 45F));
+            deliveriesTablePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 45F));
+            deliveriesTablePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 45F));
+            deliveriesTablePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 45F));
+            deliveriesTablePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 45F));
+            deliveriesTablePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 45F));
+            deliveriesTablePanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            deliveriesTablePanel.Size = new Size(786, 411);
+            deliveriesTablePanel.TabIndex = 0;
+
+            // 
+            // deliveryTitleLb
+            // 
+            deliveryTitleLb.Anchor = AnchorStyles.Right;
+            deliveryTitleLb.AutoSize = true;
+            deliveryTitleLb.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            deliveryTitleLb.Location = new Point(33, 12);
+            deliveryTitleLb.Margin = new Padding(3, 0, 15, 0);
+            deliveryTitleLb.Name = "deliveryTitleLb";
+            deliveryTitleLb.Size = new Size(87, 20);
+            deliveryTitleLb.TabIndex = 0;
+            deliveryTitleLb.Text = "Название:";
+
+            // 
+            // deliveryTitleField
+            // 
+            deliveryTitleField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            deliveryTitleField.Location = new Point(185, 9);
+            deliveryTitleField.Margin = new Padding(15, 3, 3, 3);
+            deliveryTitleField.Name = "deliveryTitleField";
+            deliveryTitleField.ReadOnly = true;
+            deliveryTitleField.Size = new Size(578, 27);
+            deliveryTitleField.TabIndex = 1;
+
+            // 
+            // deliveryAuthorLb
+            // 
+            deliveryAuthorLb.Anchor = AnchorStyles.Right;
+            deliveryAuthorLb.AutoSize = true;
+            deliveryAuthorLb.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            deliveryAuthorLb.Location = new Point(43, 57);
+            deliveryAuthorLb.Margin = new Padding(3, 0, 15, 0);
+            deliveryAuthorLb.Name = "deliveryAuthorLb";
+            deliveryAuthorLb.Size = new Size(77, 20);
+            deliveryAuthorLb.TabIndex = 2;
+            deliveryAuthorLb.Text = "Жанр:";
+
+            // 
+            // deliveryAuthorField
+            // 
+            deliveryAuthorField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            deliveryAuthorField.Location = new Point(185, 54);
+            deliveryAuthorField.Margin = new Padding(15, 3, 3, 3);
+            deliveryAuthorField.Name = "deliveryAuthorField";
+            deliveryAuthorField.ReadOnly = true;
+            deliveryAuthorField.Size = new Size(578, 27);
+            deliveryAuthorField.TabIndex = 3;
+
+            // 
+            // deliveryGenreLb
+            // 
+            deliveryGenreLb.Anchor = AnchorStyles.Right;
+            deliveryGenreLb.AutoSize = true;
+            deliveryGenreLb.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            deliveryGenreLb.Location = new Point(46, 102);
+            deliveryGenreLb.Margin = new Padding(3, 0, 15, 0);
+            deliveryGenreLb.Name = "deliveryGenreLb";
+            deliveryGenreLb.Size = new Size(74, 20);
+            deliveryGenreLb.TabIndex = 4;
+            deliveryGenreLb.Text = "Жанр:";
+
+            // 
+            // deliveryGenreField
+            // 
+            deliveryGenreField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            deliveryGenreField.Location = new Point(185, 99);
+            deliveryGenreField.Margin = new Padding(15, 3, 3, 3);
+            deliveryGenreField.Name = "deliveryGenreField";
+            deliveryGenreField.ReadOnly = true;
+            deliveryGenreField.Size = new Size(578, 27);
+            deliveryGenreField.TabIndex = 5;
+
+            // 
+            // deliveryPriceLb
+            // 
+            deliveryPriceLb.Anchor = AnchorStyles.Right;
+            deliveryPriceLb.AutoSize = true;
+            deliveryPriceLb.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            deliveryPriceLb.Location = new Point(52, 147);
+            deliveryPriceLb.Margin = new Padding(3, 0, 15, 0);
+            deliveryPriceLb.Name = "deliveryPriceLb";
+            deliveryPriceLb.Size = new Size(68, 20);
+            deliveryPriceLb.TabIndex = 6;
+            deliveryPriceLb.Text = "Цена:";
+
+            // 
+            // deliveryPriceField
+            // 
+            deliveryPriceField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            deliveryPriceField.Location = new Point(185, 144);
+            deliveryPriceField.Margin = new Padding(15, 3, 3, 3);
+            deliveryPriceField.Name = "deliveryPriceField";
+            deliveryPriceField.ReadOnly = true;
+            deliveryPriceField.Size = new Size(578, 27);
+            deliveryPriceField.TabIndex = 7;
+
+            // 
+            // deliveryPagesLb
+            // 
+            deliveryPagesLb.Anchor = AnchorStyles.Right;
+            deliveryPagesLb.AutoSize = true;
+            deliveryPagesLb.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            deliveryPagesLb.Location = new Point(23, 192);
+            deliveryPagesLb.Margin = new Padding(3, 0, 15, 0);
+            deliveryPagesLb.Name = "deliveryPagesLb";
+            deliveryPagesLb.Size = new Size(97, 20);
+            deliveryPagesLb.TabIndex = 8;
+            deliveryPagesLb.Text = "Страниц:";
+
+            // 
+            // deliveryPagesField
+            // 
+            deliveryPagesField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            deliveryPagesField.Location = new Point(185, 189);
+            deliveryPagesField.Margin = new Padding(15, 3, 3, 3);
+            deliveryPagesField.Name = "deliveryPagesField";
+            deliveryPagesField.ReadOnly = true;
+            deliveryPagesField.Size = new Size(578, 27);
+            deliveryPagesField.TabIndex = 9;
+
+            // 
+            // deliveryErrorLb
+            // 
+            deliveryErrorLb.Anchor = AnchorStyles.Right;
+            deliveryErrorLb.AutoSize = true;
+            deliveryErrorLb.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            deliveryErrorLb.ForeColor = Color.Red;
+            deliveryErrorLb.Location = new Point(57, 237);
+            deliveryErrorLb.Margin = new Padding(3, 0, 15, 0);
+            deliveryErrorLb.Name = "deliveryErrorLb";
+            deliveryErrorLb.Size = new Size(63, 20);
+            deliveryErrorLb.TabIndex = 10;
+            deliveryErrorLb.Text = "Ошибка:";
+            deliveryErrorLb.Visible = false;
+
+            // 
+            // deliveryErrorField
+            // 
+            deliveryErrorField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            deliveryErrorField.ForeColor = Color.Red;
+            deliveryErrorField.Location = new Point(185, 234);
+            deliveryErrorField.Margin = new Padding(15, 3, 3, 3);
+            deliveryErrorField.Name = "deliveryErrorField";
+            deliveryErrorField.ReadOnly = true;
+            deliveryErrorField.Size = new Size(578, 27);
+            deliveryErrorField.TabIndex = 11;
+            deliveryErrorField.Visible = false;
+
+            // 
+            // deliveryButtonsPanel
+            // 
+            deliveryButtonsPanel.Controls.Add(btnAcceptDelivery);
+            deliveryButtonsPanel.Controls.Add(btnRejectDelivery);
+            deliveryButtonsPanel.Controls.Add(btnNoticePlagiarism);
+            deliveryButtonsPanel.Controls.Add(btnNoticeMistype);
+            deliveryButtonsPanel.Controls.Add(btnIgnoreError);
+            deliveryButtonsPanel.Dock = DockStyle.Fill;
+            deliveryButtonsPanel.Location = new Point(170, 282);
+            deliveryButtonsPanel.Margin = new Padding(0, 0, 3, 0);
+            deliveryButtonsPanel.Name = "deliveryButtonsPanel";
+            deliveryButtonsPanel.Size = new Size(593, 106);
+            deliveryButtonsPanel.TabIndex = 12;
+
+            // 
+            // btnAcceptDelivery
+            // 
+            btnAcceptDelivery.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            btnAcceptDelivery.Location = new Point(3, 3);
+            btnAcceptDelivery.Name = "btnAcceptDelivery";
+            btnAcceptDelivery.Size = new Size(120, 45);
+            btnAcceptDelivery.TabIndex = 0;
+            btnAcceptDelivery.Text = "Принять";
+            btnAcceptDelivery.UseVisualStyleBackColor = true;
+            btnAcceptDelivery.Visible = true;
+
+            // 
+            // btnRejectDelivery
+            // 
+            btnRejectDelivery.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            btnRejectDelivery.Location = new Point(129, 3);
+            btnRejectDelivery.Name = "btnRejectDelivery";
+            btnRejectDelivery.Size = new Size(120, 45);
+            btnRejectDelivery.TabIndex = 1;
+            btnRejectDelivery.Text = "Отклонить";
+            btnRejectDelivery.UseVisualStyleBackColor = true;
+            btnRejectDelivery.Visible = true;
+
+            // 
+            // btnNoticePlagiarism
+            // 
+            btnNoticePlagiarism.BackColor = Color.Orange;
+            btnNoticePlagiarism.Font = new Font("Segoe UI", 10F);
+            btnNoticePlagiarism.Location = new Point(255, 3);
+            btnNoticePlagiarism.Name = "btnNoticePlagiarism";
+            btnNoticePlagiarism.Size = new Size(150, 45);
+            btnNoticePlagiarism.TabIndex = 2;
+            btnNoticePlagiarism.Text = "⚠️ Заметить плагиат";
+            btnNoticePlagiarism.UseVisualStyleBackColor = false;
+            btnNoticePlagiarism.Visible = false;
+
+            // 
+            // btnNoticeMistype
+            // 
+            btnNoticeMistype.BackColor = Color.Gold;
+            btnNoticeMistype.Font = new Font("Segoe UI", 10F);
+            btnNoticeMistype.Location = new Point(411, 3);
+            btnNoticeMistype.Name = "btnNoticeMistype";
+            btnNoticeMistype.Size = new Size(150, 45);
+            btnNoticeMistype.TabIndex = 3;
+            btnNoticeMistype.Text = "📝 Заметить опечатку";
+            btnNoticeMistype.UseVisualStyleBackColor = false;
+            btnNoticeMistype.Visible = false;
+
+            // 
+            // btnIgnoreError
+            // 
+            btnIgnoreError.BackColor = Color.LightGray;
+            btnIgnoreError.Font = new Font("Segoe UI", 10F);
+            btnIgnoreError.Location = new Point(567, 3);
+            btnIgnoreError.Name = "btnIgnoreError";
+            btnIgnoreError.Size = new Size(120, 45);
+            btnIgnoreError.TabIndex = 4;
+            btnIgnoreError.Text = "Не заметить";
+            btnIgnoreError.UseVisualStyleBackColor = false;
+            btnIgnoreError.Visible = false;
+
+            // ==================== ВКЛАДКА "ПОКУПАТЕЛИ" ====================
+            // 
+            // customersPage
+            // 
+            customersPage.Controls.Add(customersMainPanel);
+            customersPage.Location = new Point(4, 29);
+            customersPage.Name = "customersPage";
+            customersPage.Padding = new Padding(3);
+            customersPage.Size = new Size(792, 417);
+            customersPage.TabIndex = 3;
+            customersPage.Text = "Покупатели";
+            customersPage.UseVisualStyleBackColor = true;
+
+            // 
+            // customersMainPanel
+            // 
+            customersMainPanel.ColumnCount = 1;
+            customersMainPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            customersMainPanel.Controls.Add(lblNoCustomers, 0, 0);
+            customersMainPanel.Controls.Add(customersQueuePanel, 0, 1);
+            customersMainPanel.Controls.Add(unsatisfiedLabel, 0, 2);
+            customersMainPanel.Dock = DockStyle.Fill;
+            customersMainPanel.Location = new Point(3, 3);
+            customersMainPanel.Name = "customersMainPanel";
+            customersMainPanel.RowCount = 3;
+            customersMainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
+            customersMainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            customersMainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            customersMainPanel.Size = new Size(786, 411);
+            customersMainPanel.TabIndex = 0;
+
+            // 
+            // lblNoCustomers
+            // 
+            lblNoCustomers.Dock = DockStyle.Fill;
+            lblNoCustomers.Font = new Font("Segoe UI", 14F, FontStyle.Italic);
+            lblNoCustomers.ForeColor = Color.Gray;
+            lblNoCustomers.Location = new Point(3, 0);
+            lblNoCustomers.Name = "lblNoCustomers";
+            lblNoCustomers.Size = new Size(780, 60);
+            lblNoCustomers.TabIndex = 0;
+            lblNoCustomers.Text = "У Вас пока нет ни одного покупателя";
+            lblNoCustomers.TextAlign = ContentAlignment.MiddleCenter;
+
+            // 
+            // customersQueuePanel
+            // 
+            customersQueuePanel.AutoScroll = true;
+            customersQueuePanel.Dock = DockStyle.Fill;
+            customersQueuePanel.Location = new Point(3, 63);
+            customersQueuePanel.Name = "customersQueuePanel";
+            customersQueuePanel.Size = new Size(780, 305);
+            customersQueuePanel.TabIndex = 1;
+
+            // 
+            // unsatisfiedLabel
+            // 
+            unsatisfiedLabel.Dock = DockStyle.Fill;
+            unsatisfiedLabel.Font = new Font("Segoe UI", 10F);
+            unsatisfiedLabel.ForeColor = Color.DarkRed;
+            unsatisfiedLabel.Location = new Point(3, 371);
+            unsatisfiedLabel.Name = "unsatisfiedLabel";
+            unsatisfiedLabel.Size = new Size(780, 40);
+            unsatisfiedLabel.TabIndex = 2;
+            unsatisfiedLabel.Text = "Недовольных клиентов: 0/3";
+            unsatisfiedLabel.TextAlign = ContentAlignment.MiddleRight;
+
             // 
             // BookStoreForm
             // 
@@ -691,11 +1041,18 @@ namespace BookShop
             ((System.ComponentModel.ISupportInitialize)priceNumbericUpDown).EndInit();
             ((System.ComponentModel.ISupportInitialize)pagesCountNumbericUpDown).EndInit();
             flowLayoutPanel1.ResumeLayout(false);
+            deliveriesPage.ResumeLayout(false);
+            deliveriesTablePanel.ResumeLayout(false);
+            deliveriesTablePanel.PerformLayout();
+            deliveryButtonsPanel.ResumeLayout(false);
+            customersPage.ResumeLayout(false);
+            customersMainPanel.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
 
+        // Существующие элементы
         private TabControl bookFormTabControl;
         private TabPage shopPage;
         private TabPage newBookPage;
@@ -738,7 +1095,36 @@ namespace BookShop
         private TextBox bookPagesCountField;
         private Label bookPagesCountLb;
         private Button bookSellBtn;
+
+        // Новые вкладки
         private TabPage deliveriesPage;
         private TabPage customersPage;
+
+        // Элементы вкладки "Поставки"
+        private TableLayoutPanel deliveriesTablePanel;
+        private Label deliveryTitleLb;
+        private TextBox deliveryTitleField;
+        private Label deliveryAuthorLb;
+        private TextBox deliveryAuthorField;
+        private Label deliveryGenreLb;
+        private TextBox deliveryGenreField;
+        private Label deliveryPriceLb;
+        private TextBox deliveryPriceField;
+        private Label deliveryPagesLb;
+        private TextBox deliveryPagesField;
+        private Label deliveryErrorLb;
+        private TextBox deliveryErrorField;
+        private FlowLayoutPanel deliveryButtonsPanel;
+        private Button btnAcceptDelivery;
+        private Button btnRejectDelivery;
+        private Button btnNoticePlagiarism;
+        private Button btnNoticeMistype;
+        private Button btnIgnoreError;
+
+        // Элементы вкладки "Покупатели"
+        private TableLayoutPanel customersMainPanel;
+        private Label lblNoCustomers;
+        private Panel customersQueuePanel;
+        private Label unsatisfiedLabel;
     }
 }
