@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BookShopLibrary;
@@ -12,6 +12,13 @@ namespace BookShopLibrary
     public class Shop
     {
         private List<BookShelf> shelves = new List<BookShelf>();
+
+        /// <summary>
+        /// Словарь для отслеживания максимальных номеров частей книг (сиквелов)
+        /// Ключ: "Название|Автор" (уникальная комбинация)
+        /// Значение: максимальный номер части для этой серии
+        /// </summary>
+        private Dictionary<string, int> _maxPartNumbers = new Dictionary<string, int>();
 
         /// <summary>
         /// Текущий баланс магазина (заработанные деньги)
@@ -177,6 +184,11 @@ namespace BookShopLibrary
 
         /// <summary>
         /// Попытка добавить книгу в магазин с автоматическим подбором шкафа
+        /// Реализует логику:
+        /// 1. Определяет, является ли книга сиквелом (продолжением)
+        /// 2. Ищет шкаф с таким же жанром и свободным местом
+        /// 3. Если нет подходящего, ищет пустой шкаф и меняет его жанр
+        /// 4. Если нет пустого, создаёт новый шкаф (если есть место)
         /// </summary>
         /// <param name="book">Добавляемая книга</param>
         /// <returns>true - книга добавлена, false - нет места</returns>
@@ -185,10 +197,23 @@ namespace BookShopLibrary
             if (book == null)
                 throw new ArgumentNullException(nameof(book));
 
-            // Проверка на дубликаты названий и добавление индекса при необходимости
-            EnsureUniqueTitle(book);
+            // ========== 1. Обработка сиквелов ==========
+            string bookKey = $"{book.Title}|{book.Author}";
 
-            // 1. Поиск шкафа с подходящим жанром и свободным местом
+            if (_maxPartNumbers.ContainsKey(bookKey))
+            {
+                // Книга этой серии уже есть - это сиквел (продолжение)
+                int nextPart = _maxPartNumbers[bookKey] + 1;
+                book.PartNumber = nextPart;
+                _maxPartNumbers[bookKey] = nextPart;
+            }
+            else
+            {
+                // Новая серия книг
+                _maxPartNumbers[bookKey] = 0;
+            }
+
+            // ========== 2. Поиск шкафа с подходящим жанром ==========
             var targetShelf = shelves.FirstOrDefault(s =>
                 s.Genre == book.Genre && s.HasFreeSpace);
 
@@ -197,7 +222,7 @@ namespace BookShopLibrary
                 return targetShelf.AddBook(book);
             }
 
-            // 2. Поиск пустого шкафа для переназначения жанра
+            // ========== 3. Поиск пустого шкафа для переназначения жанра ==========
             var emptyShelf = shelves.FirstOrDefault(s => s.IsEmpty);
             if (emptyShelf != null)
             {
@@ -205,7 +230,7 @@ namespace BookShopLibrary
                 return emptyShelf.AddBook(book);
             }
 
-            // 3. Создание нового шкафа, если есть место
+            // ========== 4. Создание нового шкафа, если есть место ==========
             if (shelves.Count < MaxShelves)
             {
                 int newId = shelves.Count > 0 ? shelves.Max(s => s.Id) + 1 : 1;
@@ -217,7 +242,55 @@ namespace BookShopLibrary
         }
 
         /// <summary>
+        /// Продаёт книгу по ID шкафа и ID книги
+        /// Обновляет словарь частей и баланс магазина
+        /// </summary>
+        /// <param name="shelfId">ID шкафа, в котором находится книга</param>
+        /// <param name="bookId">ID книги для продажи</param>
+        /// <returns>Цена проданной книги</returns>
+        /// <exception cref="InvalidOperationException">Если шкаф или книга не найдены</exception>
+        public decimal SellBook(int shelfId, int bookId)
+        {
+            // Находим нужный шкаф
+            var shelf = shelves.FirstOrDefault(s => s.Id == shelfId);
+            if (shelf == null)
+                throw new InvalidOperationException("Шкаф не найден");
+
+            // Находим нужную книгу
+            var book = shelf.FindBookById(bookId);
+            if (book == null)
+                throw new InvalidOperationException("Книга не найдена");
+
+            // Получаем цену и добавляем её на баланс
+            decimal price = book.Sell();
+            Balance += price;
+
+            // ========== Обновление словаря частей ==========
+            // Проверяем, не была ли это последняя книга определённой части
+            string bookKey = $"{book.Title}|{book.Author}";
+            if (_maxPartNumbers.ContainsKey(bookKey))
+            {
+                // Проверяем, остались ли ещё книги этой серии в магазине
+                bool hasOtherParts = shelves.Any(s => s.GetAllBooks().Any(b =>
+                    b.Title == book.Title && b.Author == book.Author && b.Id != bookId));
+
+                if (!hasOtherParts)
+                {
+                    // Если не осталось ни одной книги этой серии, удаляем из словаря
+                    // Это нужно, чтобы при повторном поступлении книги она стала оригиналом,
+                    // а не продолжала нумерацию с проданного места
+                    _maxPartNumbers.Remove(bookKey);
+                }
+            }
+
+            // Удаляем книгу из шкафа
+            shelf.RemoveBook(bookId);
+            return price;
+        }
+
+        /// <summary>
         /// Проверяет уникальность названия книги и добавляет числовой индекс при необходимости
+        /// (используется для старых методов, не использующих сиквелы)
         /// </summary>
         /// <param name="book">Книга для проверки</param>
         private void EnsureUniqueTitle(Book book)
