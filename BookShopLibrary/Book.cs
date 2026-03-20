@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -44,6 +44,16 @@ namespace BookShopLibrary
         public decimal Price { get; set; }
 
         /// <summary>
+        /// Номер части книги (0 - оригинал, 1,2,... - продолжения)
+        /// </summary>
+        public int PartNumber { get; set; } = 0;
+
+        /// <summary>
+        /// Отображаемое название с учётом номера части
+        /// </summary>
+        public string DisplayTitle => PartNumber == 0 ? Title : $"{Title} {PartNumber}";
+
+        /// <summary>
         /// Конструктор для создания книги с указанным ID
         /// </summary>
         /// <param name="id">Идентификационный номер</param>
@@ -52,7 +62,8 @@ namespace BookShopLibrary
         /// <param name="genre">Жанр</param>
         /// <param name="pages">Количество страниц</param>
         /// <param name="price">Цена</param>
-        public Book(int id, string title, string author, string genre, int pages, decimal price)
+        /// <param name="partNumber">Номер части (по умолчанию 0)</param>
+        public Book(int id, string title, string author, string genre, int pages, decimal price, int partNumber = 0)
         {
             Id = id;
             Title = title;
@@ -60,6 +71,7 @@ namespace BookShopLibrary
             Genre = genre;
             Pages = pages;
             Price = price;
+            PartNumber = partNumber;
         }
 
         /// <summary>
@@ -75,32 +87,23 @@ namespace BookShopLibrary
         /// Статический метод случайной генерации книги
         /// </summary>
         /// <param name="nextId">Следующий ID для новой книги</param>
+        /// <param name="bookAuthorPairs">Список пар "название;автор"</param>
+        /// <param name="genres">Список жанров</param>
         /// <returns>Случайно сгенерированная книга</returns>
-        public static Book GenerateRandom(int nextId)
+        public static Book GenerateRandom(int nextId, List<(string Title, string Author)> bookAuthorPairs, List<string> genres)
         {
             try
             {
-                string basePath = AppDomain.CurrentDomain.BaseDirectory;
-
-                // Чтение данных из файлов
-                string[] titles = File.ReadAllLines(Path.Combine(basePath, "titles.txt"), Encoding.UTF8);
-                string[] authors = File.ReadAllLines(Path.Combine(basePath, "authors.txt"), Encoding.UTF8);
-                string[] genres = File.ReadAllLines(Path.Combine(basePath, "genres.txt"), Encoding.UTF8);
-
-                // Генерация названия
-                string title = titles[random.Next(titles.Length)].Trim();
-
-                // Генерация автора
-                string author = authors[random.Next(authors.Length)].Trim();
-
-                // Генерация жанра
-                string genre = genres[random.Next(genres.Length)].Trim();
+                // Выбираем случайную пару "название-автор"
+                var pair = bookAuthorPairs[random.Next(bookAuthorPairs.Count)];
+                // Выбираем случайный жанр
+                string genre = genres[random.Next(genres.Count)];
 
                 // Генерация случайных чисел
                 int pages = random.Next(50, 2001);
                 decimal price = random.Next(100, 5001);
 
-                return new Book(nextId, title, author, genre, pages, price);
+                return new Book(nextId, pair.Title, pair.Author, genre, pages, price);
             }
             catch (Exception ex)
             {
@@ -112,6 +115,11 @@ namespace BookShopLibrary
         /// Переопределение ToString для отображения в списках
         /// </summary>
         public override string ToString()
+        {
+            return $"{Id}: {DisplayTitle} - {Author}";
+        }
+    }
+}
         {
             return $"{Id}: {Title} - {Author}";
         }
