@@ -21,6 +21,9 @@ namespace BookShop
         private readonly string authorsFile = "authors.txt";
         private readonly string genresFile = "genres.txt";
 
+        // Поле для хранения выбранной сложности
+        private string gameDifficulty;
+
         /// <summary>
         /// Конструктор формы. Инициализирует магазин, элементы управления и загружает данные.
         /// </summary>
@@ -36,6 +39,89 @@ namespace BookShop
             InitializeFormControls();
             CreateDataFilesIfNotExist();
             LoadGenresFromFile();
+
+            gameDifficulty = "Нормальный"; // значение по умолчанию
+        }
+
+        /// <summary>
+        /// Конструктор формы с выбором сложности. Запускается из титульного экрана.
+        /// </summary>
+        /// <param name="difficulty">Выбранный режим сложности (Лёгкий/Нормальный/Сложный)</param>
+        public BookStoreForm(string difficulty)
+        {
+            InitializeComponent();
+
+            this.DoubleBuffered = true;
+            searchTypeCmb.SelectedIndex = 0;
+
+            SubscribeToEvents();
+            InitializeShop();
+            InitializeFormControls();
+            CreateDataFilesIfNotExist();
+            LoadGenresFromFile();
+
+            gameDifficulty = difficulty;
+
+            // Настраиваем параметры игры в зависимости от сложности
+            ConfigureGameDifficulty();
+        }
+
+        /// <summary>
+        /// Настройка параметров игры в зависимости от выбранного режима сложности.
+        /// </summary>
+        private void ConfigureGameDifficulty()
+        {
+            switch (gameDifficulty)
+            {
+                case "Лёгкий":
+                    // Легкий режим: больше баланс
+                    if (shop != null)
+                    {
+                        shop.AddToBalance(2000);
+                    }
+                    MessageBox.Show("Запущен ЛЁГКИЙ режим!\n\n" +
+                        "• Стартовый баланс: 2000 руб.\n" +
+                        "• Книги приходят реже\n" +
+                        "• Покупатели появляются реже\n" +
+                        "• Очередь до 5 покупателей",
+                        "Режим игры", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    break;
+
+                case "Нормальный":
+                    // Нормальный режим: стандартные настройки
+                    if (shop != null)
+                    {
+                        shop.AddToBalance(1000);
+                    }
+                    MessageBox.Show("Запущен НОРМАЛЬНЫЙ режим!\n\n" +
+                        "• Стартовый баланс: 1000 руб.\n" +
+                        "• Стандартная частота событий\n" +
+                        "• Очередь до 4 покупателей",
+                        "Режим игры", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    break;
+
+                case "Сложный":
+                    // Сложный режим: меньше баланс
+                    if (shop != null)
+                    {
+                        shop.AddToBalance(500);
+                    }
+                    MessageBox.Show("Запущен СЛОЖНЫЙ режим!\n\n" +
+                        "• Стартовый баланс: 500 руб.\n" +
+                        "• Книги приходят чаще\n" +
+                        "• Покупатели появляются чаще\n" +
+                        "• Очередь до 3 покупателей",
+                        "Режим игры", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    break;
+
+                default:
+                    gameDifficulty = "Нормальный";
+                    if (shop != null)
+                    {
+                        shop.AddToBalance(1000);
+                    }
+                    break;
+            }
         }
 
         /// <summary>
