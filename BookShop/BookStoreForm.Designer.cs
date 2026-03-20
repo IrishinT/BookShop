@@ -71,6 +71,10 @@ namespace BookShop
             createBookBtn = new Button();
             generateBookBtn = new Button();
             ganreComboBox = new ComboBox();
+            // Новые вкладки
+            deliveriesPage = new TabPage();
+            customersPage = new TabPage();
+
             bookFormTabControl.SuspendLayout();
             shopPage.SuspendLayout();
             bookInfoLayoutPanel.SuspendLayout();
@@ -82,11 +86,14 @@ namespace BookShop
             ((System.ComponentModel.ISupportInitialize)pagesCountNumbericUpDown).BeginInit();
             flowLayoutPanel1.SuspendLayout();
             SuspendLayout();
+
             // 
             // bookFormTabControl
             // 
             bookFormTabControl.Controls.Add(shopPage);
             bookFormTabControl.Controls.Add(newBookPage);
+            bookFormTabControl.Controls.Add(deliveriesPage);
+            bookFormTabControl.Controls.Add(customersPage);
             bookFormTabControl.Dock = DockStyle.Fill;
             bookFormTabControl.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 204);
             bookFormTabControl.Location = new Point(0, 0);
@@ -94,6 +101,7 @@ namespace BookShop
             bookFormTabControl.SelectedIndex = 0;
             bookFormTabControl.Size = new Size(800, 450);
             bookFormTabControl.TabIndex = 0;
+
             // 
             // shopPage
             // 
@@ -110,6 +118,31 @@ namespace BookShop
             shopPage.TabIndex = 0;
             shopPage.Text = "Магазин";
             shopPage.UseVisualStyleBackColor = true;
+
+            // 
+            // deliveriesPage
+            // 
+            deliveriesPage.Location = new Point(4, 29);
+            deliveriesPage.Name = "deliveriesPage";
+            deliveriesPage.Padding = new Padding(3);
+            deliveriesPage.Size = new Size(792, 417);
+            deliveriesPage.TabIndex = 2;
+            deliveriesPage.Text = "Поставки";
+            deliveriesPage.Visible = false;
+            deliveriesPage.UseVisualStyleBackColor = true;
+
+            // 
+            // customersPage
+            // 
+            customersPage.Location = new Point(4, 29);
+            customersPage.Name = "customersPage";
+            customersPage.Padding = new Padding(3);
+            customersPage.Size = new Size(792, 417);
+            customersPage.TabIndex = 3;
+            customersPage.Text = "Покупатели";
+            customersPage.Visible = true;
+            customersPage.UseVisualStyleBackColor = true;
+
             // 
             // bookInfoLayoutPanel
             // 
@@ -140,6 +173,7 @@ namespace BookShop
             bookInfoLayoutPanel.Size = new Size(446, 328);
             bookInfoLayoutPanel.TabIndex = 3;
             bookInfoLayoutPanel.Paint += bookInfoLayoutPanel_Paint;
+
             // 
             // bookPagesCountField
             // 
@@ -151,6 +185,7 @@ namespace BookShop
             bookPagesCountField.ReadOnly = true;
             bookPagesCountField.Size = new Size(200, 27);
             bookPagesCountField.TabIndex = 10;
+
             // 
             // bookPagesCountLb
             // 
@@ -162,6 +197,7 @@ namespace BookShop
             bookPagesCountLb.Size = new Size(94, 40);
             bookPagesCountLb.TabIndex = 9;
             bookPagesCountLb.Text = "Количество страниц";
+
             // 
             // bookPriceField
             // 
@@ -173,6 +209,7 @@ namespace BookShop
             bookPriceField.ReadOnly = true;
             bookPriceField.Size = new Size(200, 27);
             bookPriceField.TabIndex = 8;
+
             // 
             // bookPriceLb
             // 
@@ -184,6 +221,7 @@ namespace BookShop
             bookPriceLb.Size = new Size(45, 20);
             bookPriceLb.TabIndex = 7;
             bookPriceLb.Text = "Цена";
+
             // 
             // bookIDField
             // 
@@ -195,6 +233,7 @@ namespace BookShop
             bookIDField.ReadOnly = true;
             bookIDField.Size = new Size(200, 27);
             bookIDField.TabIndex = 6;
+
             // 
             // bookIDLb
             // 
@@ -206,6 +245,7 @@ namespace BookShop
             bookIDLb.Size = new Size(24, 20);
             bookIDLb.TabIndex = 5;
             bookIDLb.Text = "ID";
+
             // 
             // bookAuthorField
             // 
@@ -217,6 +257,7 @@ namespace BookShop
             bookAuthorField.ReadOnly = true;
             bookAuthorField.Size = new Size(286, 27);
             bookAuthorField.TabIndex = 4;
+
             // 
             // bookAuthorLb
             // 
@@ -228,6 +269,7 @@ namespace BookShop
             bookAuthorLb.Size = new Size(51, 20);
             bookAuthorLb.TabIndex = 3;
             bookAuthorLb.Text = "Автор";
+
             // 
             // bookTitleLb
             // 
@@ -239,6 +281,7 @@ namespace BookShop
             bookTitleLb.Size = new Size(77, 20);
             bookTitleLb.TabIndex = 1;
             bookTitleLb.Text = "Название";
+
             // 
             // bookTitleField
             // 
@@ -250,6 +293,7 @@ namespace BookShop
             bookTitleField.ReadOnly = true;
             bookTitleField.Size = new Size(286, 27);
             bookTitleField.TabIndex = 2;
+
             // 
             // bookSellBtn
             // 
@@ -261,6 +305,7 @@ namespace BookShop
             bookSellBtn.TabIndex = 0;
             bookSellBtn.Text = "Продать";
             bookSellBtn.UseVisualStyleBackColor = true;
+
             // 
             // shopTablePanel
             // 
@@ -279,10 +324,9 @@ namespace BookShop
             shopTablePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 33F));
             shopTablePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 71F));
             shopTablePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 105F));
-            shopTablePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
-            shopTablePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
             shopTablePanel.Size = new Size(311, 328);
             shopTablePanel.TabIndex = 2;
+
             // 
             // shelfSelectLb
             // 
@@ -294,6 +338,7 @@ namespace BookShop
             shelfSelectLb.Size = new Size(119, 20);
             shelfSelectLb.TabIndex = 0;
             shelfSelectLb.Text = "Выберите шкаф";
+
             // 
             // shelfSelectCmb
             // 
@@ -304,6 +349,7 @@ namespace BookShop
             shelfSelectCmb.Name = "shelfSelectCmb";
             shelfSelectCmb.Size = new Size(281, 28);
             shelfSelectCmb.TabIndex = 1;
+
             // 
             // bookSelectLb
             // 
@@ -315,6 +361,7 @@ namespace BookShop
             bookSelectLb.Size = new Size(120, 20);
             bookSelectLb.TabIndex = 2;
             bookSelectLb.Text = "Выберите книгу";
+
             // 
             // bookSelectCmb
             // 
@@ -325,6 +372,7 @@ namespace BookShop
             bookSelectCmb.Name = "bookSelectCmb";
             bookSelectCmb.Size = new Size(281, 28);
             bookSelectCmb.TabIndex = 3;
+
             // 
             // shelfCapacity
             // 
@@ -336,6 +384,7 @@ namespace BookShop
             shelfCapacity.Size = new Size(148, 20);
             shelfCapacity.TabIndex = 4;
             shelfCapacity.Text = "Загруженность 0/10";
+
             // 
             // balanceLb
             // 
@@ -348,6 +397,7 @@ namespace BookShop
             balanceLb.Size = new Size(106, 25);
             balanceLb.TabIndex = 1;
             balanceLb.Text = "Баланс: 0р";
+
             // 
             // searchPanel
             // 
@@ -360,6 +410,7 @@ namespace BookShop
             searchPanel.Padding = new Padding(15);
             searchPanel.Size = new Size(786, 58);
             searchPanel.TabIndex = 0;
+
             // 
             // searchTypeCmb
             // 
@@ -369,6 +420,7 @@ namespace BookShop
             searchTypeCmb.Name = "searchTypeCmb";
             searchTypeCmb.Size = new Size(164, 28);
             searchTypeCmb.TabIndex = 0;
+
             // 
             // searchField
             // 
@@ -376,6 +428,7 @@ namespace BookShop
             searchField.Name = "searchField";
             searchField.Size = new Size(365, 27);
             searchField.TabIndex = 1;
+
             // 
             // searchBtn
             // 
@@ -386,6 +439,7 @@ namespace BookShop
             searchBtn.TabIndex = 2;
             searchBtn.Text = "Поиск";
             searchBtn.UseVisualStyleBackColor = true;
+
             // 
             // newBookPage
             // 
@@ -399,6 +453,8 @@ namespace BookShop
             newBookPage.Size = new Size(792, 417);
             newBookPage.TabIndex = 1;
             newBookPage.Text = "Заказать книгу";
+            newBookPage.UseVisualStyleBackColor = true;
+
             // 
             // newBookTablePanel
             // 
@@ -434,6 +490,7 @@ namespace BookShop
             newBookTablePanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             newBookTablePanel.Size = new Size(786, 411);
             newBookTablePanel.TabIndex = 0;
+
             // 
             // idField
             // 
@@ -444,6 +501,7 @@ namespace BookShop
             idField.ReadOnly = true;
             idField.Size = new Size(134, 27);
             idField.TabIndex = 11;
+
             // 
             // idLabel
             // 
@@ -455,6 +513,7 @@ namespace BookShop
             idLabel.Size = new Size(24, 20);
             idLabel.TabIndex = 10;
             idLabel.Text = "ID";
+
             // 
             // priceNumbericUpDown
             // 
@@ -464,6 +523,7 @@ namespace BookShop
             priceNumbericUpDown.Name = "priceNumbericUpDown";
             priceNumbericUpDown.Size = new Size(134, 27);
             priceNumbericUpDown.TabIndex = 9;
+
             // 
             // priceLabel
             // 
@@ -475,6 +535,7 @@ namespace BookShop
             priceLabel.Size = new Size(45, 20);
             priceLabel.TabIndex = 8;
             priceLabel.Text = "Цена";
+
             // 
             // pagesCountLabel
             // 
@@ -486,6 +547,7 @@ namespace BookShop
             pagesCountLabel.Size = new Size(94, 40);
             pagesCountLabel.TabIndex = 6;
             pagesCountLabel.Text = "Количество страниц";
+
             // 
             // ganreLabel
             // 
@@ -497,6 +559,7 @@ namespace BookShop
             ganreLabel.Size = new Size(48, 20);
             ganreLabel.TabIndex = 4;
             ganreLabel.Text = "Жанр";
+
             // 
             // authorField
             // 
@@ -507,6 +570,7 @@ namespace BookShop
             authorField.Name = "authorField";
             authorField.Size = new Size(578, 27);
             authorField.TabIndex = 3;
+
             // 
             // bookNameField
             // 
@@ -517,6 +581,7 @@ namespace BookShop
             bookNameField.Name = "bookNameField";
             bookNameField.Size = new Size(578, 27);
             bookNameField.TabIndex = 0;
+
             // 
             // bookNameLabel
             // 
@@ -528,6 +593,7 @@ namespace BookShop
             bookNameLabel.Size = new Size(121, 20);
             bookNameLabel.TabIndex = 1;
             bookNameLabel.Text = "Название книги";
+
             // 
             // authorLabel
             // 
@@ -539,6 +605,7 @@ namespace BookShop
             authorLabel.Size = new Size(51, 20);
             authorLabel.TabIndex = 2;
             authorLabel.Text = "Автор";
+
             // 
             // pagesCountNumbericUpDown
             // 
@@ -548,6 +615,7 @@ namespace BookShop
             pagesCountNumbericUpDown.Name = "pagesCountNumbericUpDown";
             pagesCountNumbericUpDown.Size = new Size(134, 27);
             pagesCountNumbericUpDown.TabIndex = 7;
+
             // 
             // flowLayoutPanel1
             // 
@@ -559,6 +627,7 @@ namespace BookShop
             flowLayoutPanel1.Name = "flowLayoutPanel1";
             flowLayoutPanel1.Size = new Size(578, 105);
             flowLayoutPanel1.TabIndex = 12;
+
             // 
             // createBookBtn
             // 
@@ -570,6 +639,7 @@ namespace BookShop
             createBookBtn.TabIndex = 0;
             createBookBtn.Text = "Заказать";
             createBookBtn.UseVisualStyleBackColor = true;
+
             // 
             // generateBookBtn
             // 
@@ -582,6 +652,7 @@ namespace BookShop
             generateBookBtn.TabIndex = 1;
             generateBookBtn.Text = "Сгенерировать";
             generateBookBtn.UseVisualStyleBackColor = true;
+
             // 
             // ganreComboBox
             // 
@@ -594,6 +665,7 @@ namespace BookShop
             ganreComboBox.Name = "ganreComboBox";
             ganreComboBox.Size = new Size(578, 28);
             ganreComboBox.TabIndex = 5;
+
             // 
             // BookStoreForm
             // 
@@ -665,7 +737,8 @@ namespace BookShop
         private TextBox bookTitleField;
         private TextBox bookPagesCountField;
         private Label bookPagesCountLb;
-        private FlowLayoutPanel flowLayoutPanel2;
         private Button bookSellBtn;
+        private TabPage deliveriesPage;
+        private TabPage customersPage;
     }
 }
