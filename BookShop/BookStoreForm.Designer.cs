@@ -342,7 +342,7 @@ namespace BookShop
             bookSellBtn.Location = new Point(166, 387);
             bookSellBtn.Margin = new Padding(17, 4, 17, 4);
             bookSellBtn.Name = "bookSellBtn";
-            bookSellBtn.Size = new Size(228, 45);
+            bookSellBtn.Size = new Size(239, 45);
             bookSellBtn.TabIndex = 0;
             bookSellBtn.Text = "Продать";
             bookSellBtn.UseVisualStyleBackColor = true;
