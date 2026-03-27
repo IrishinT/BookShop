@@ -124,7 +124,7 @@ namespace BookShop
             bookFormTabControl.Margin = new Padding(3, 4, 3, 4);
             bookFormTabControl.Name = "bookFormTabControl";
             bookFormTabControl.SelectedIndex = 0;
-            bookFormTabControl.Size = new Size(914, 600);
+            bookFormTabControl.Size = new Size(1085, 612);
             bookFormTabControl.TabIndex = 0;
             // 
             // shopPage
@@ -139,7 +139,7 @@ namespace BookShop
             shopPage.Margin = new Padding(3, 4, 3, 4);
             shopPage.Name = "shopPage";
             shopPage.Padding = new Padding(3, 4, 3, 4);
-            shopPage.Size = new Size(906, 562);
+            shopPage.Size = new Size(1077, 574);
             shopPage.TabIndex = 0;
             shopPage.Text = "Магазин";
             shopPage.UseVisualStyleBackColor = true;
@@ -171,13 +171,61 @@ namespace BookShop
             bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 40F));
             bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 40F));
             bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 40F));
-            bookInfoLayoutPanel.Size = new Size(510, 437);
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
+            bookInfoLayoutPanel.Size = new Size(681, 449);
             bookInfoLayoutPanel.TabIndex = 3;
             // 
             // bookPagesCountField
             // 
             bookPagesCountField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            bookPagesCountField.Location = new Point(166, 308);
+            bookPagesCountField.Location = new Point(166, 317);
             bookPagesCountField.Margin = new Padding(17, 4, 17, 4);
             bookPagesCountField.MaximumSize = new Size(228, 32);
             bookPagesCountField.Name = "bookPagesCountField";
@@ -189,7 +237,7 @@ namespace BookShop
             // 
             bookPagesCountLb.Anchor = AnchorStyles.Right;
             bookPagesCountLb.AutoSize = true;
-            bookPagesCountLb.Location = new Point(18, 299);
+            bookPagesCountLb.Location = new Point(18, 308);
             bookPagesCountLb.Margin = new Padding(17, 4, 17, 4);
             bookPagesCountLb.Name = "bookPagesCountLb";
             bookPagesCountLb.Size = new Size(114, 50);
@@ -199,7 +247,7 @@ namespace BookShop
             // bookPriceField
             // 
             bookPriceField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            bookPriceField.Location = new Point(166, 236);
+            bookPriceField.Location = new Point(166, 243);
             bookPriceField.Margin = new Padding(17, 4, 17, 4);
             bookPriceField.MaximumSize = new Size(228, 32);
             bookPriceField.Name = "bookPriceField";
@@ -211,7 +259,7 @@ namespace BookShop
             // 
             bookPriceLb.Anchor = AnchorStyles.Right;
             bookPriceLb.AutoSize = true;
-            bookPriceLb.Location = new Point(75, 239);
+            bookPriceLb.Location = new Point(75, 246);
             bookPriceLb.Margin = new Padding(17, 4, 17, 4);
             bookPriceLb.Name = "bookPriceLb";
             bookPriceLb.Size = new Size(57, 25);
@@ -221,7 +269,7 @@ namespace BookShop
             // bookIDField
             // 
             bookIDField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            bookIDField.Location = new Point(166, 164);
+            bookIDField.Location = new Point(166, 169);
             bookIDField.Margin = new Padding(17, 4, 17, 4);
             bookIDField.MaximumSize = new Size(228, 32);
             bookIDField.Name = "bookIDField";
@@ -233,7 +281,7 @@ namespace BookShop
             // 
             bookIDLb.Anchor = AnchorStyles.Right;
             bookIDLb.AutoSize = true;
-            bookIDLb.Location = new Point(102, 167);
+            bookIDLb.Location = new Point(102, 172);
             bookIDLb.Margin = new Padding(17, 4, 17, 4);
             bookIDLb.Name = "bookIDLb";
             bookIDLb.Size = new Size(30, 25);
@@ -243,19 +291,19 @@ namespace BookShop
             // bookAuthorField
             // 
             bookAuthorField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            bookAuthorField.Location = new Point(166, 92);
+            bookAuthorField.Location = new Point(166, 95);
             bookAuthorField.Margin = new Padding(17, 4, 17, 4);
             bookAuthorField.MaximumSize = new Size(799, 32);
             bookAuthorField.Name = "bookAuthorField";
             bookAuthorField.ReadOnly = true;
-            bookAuthorField.Size = new Size(327, 32);
+            bookAuthorField.Size = new Size(498, 32);
             bookAuthorField.TabIndex = 4;
             // 
             // bookAuthorLb
             // 
             bookAuthorLb.Anchor = AnchorStyles.Right;
             bookAuthorLb.AutoSize = true;
-            bookAuthorLb.Location = new Point(68, 95);
+            bookAuthorLb.Location = new Point(68, 98);
             bookAuthorLb.Margin = new Padding(17, 4, 17, 4);
             bookAuthorLb.Name = "bookAuthorLb";
             bookAuthorLb.Size = new Size(64, 25);
@@ -266,7 +314,7 @@ namespace BookShop
             // 
             bookTitleLb.Anchor = AnchorStyles.Right;
             bookTitleLb.AutoSize = true;
-            bookTitleLb.Location = new Point(37, 23);
+            bookTitleLb.Location = new Point(37, 24);
             bookTitleLb.Margin = new Padding(17, 4, 17, 4);
             bookTitleLb.Name = "bookTitleLb";
             bookTitleLb.Size = new Size(95, 25);
@@ -276,21 +324,25 @@ namespace BookShop
             // bookTitleField
             // 
             bookTitleField.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            bookTitleField.Location = new Point(166, 20);
+            bookTitleField.Location = new Point(166, 21);
             bookTitleField.Margin = new Padding(17, 4, 17, 4);
             bookTitleField.MaximumSize = new Size(799, 32);
             bookTitleField.Name = "bookTitleField";
             bookTitleField.ReadOnly = true;
-            bookTitleField.Size = new Size(327, 32);
+            bookTitleField.Size = new Size(498, 32);
             bookTitleField.TabIndex = 2;
             // 
             // bookSellBtn
             // 
             bookSellBtn.Anchor = AnchorStyles.Left;
-            bookSellBtn.Location = new Point(166, 376);
+            bookSellBtn.FlatAppearance.BorderColor = Color.FromArgb(255, 128, 0);
+            bookSellBtn.FlatAppearance.BorderSize = 33;
+            bookSellBtn.FlatAppearance.MouseDownBackColor = Color.FromArgb(0, 0, 0, 3);
+            bookSellBtn.Image = (Image)resources.GetObject("bookSellBtn.Image");
+            bookSellBtn.Location = new Point(166, 387);
             bookSellBtn.Margin = new Padding(17, 4, 17, 4);
             bookSellBtn.Name = "bookSellBtn";
-            bookSellBtn.Size = new Size(135, 45);
+            bookSellBtn.Size = new Size(228, 45);
             bookSellBtn.TabIndex = 0;
             bookSellBtn.Text = "Продать";
             bookSellBtn.UseVisualStyleBackColor = true;
@@ -374,7 +426,7 @@ namespace BookShop
             balanceLb.AutoSize = true;
             balanceLb.Dock = DockStyle.Right;
             balanceLb.Font = new Font("Segoe UI Semibold", 14.25F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            balanceLb.Location = new Point(771, 4);
+            balanceLb.Location = new Point(942, 4);
             balanceLb.Margin = new Padding(3, 4, 3, 4);
             balanceLb.Name = "balanceLb";
             balanceLb.Size = new Size(132, 32);
@@ -391,7 +443,7 @@ namespace BookShop
             searchPanel.Margin = new Padding(3, 4, 3, 4);
             searchPanel.Name = "searchPanel";
             searchPanel.Padding = new Padding(17, 20, 17, 20);
-            searchPanel.Size = new Size(898, 77);
+            searchPanel.Size = new Size(1069, 77);
             searchPanel.TabIndex = 0;
             // 
             // searchTypeCmb
@@ -415,13 +467,15 @@ namespace BookShop
             // searchBtn
             // 
             searchBtn.Anchor = AnchorStyles.None;
+            searchBtn.Image = (Image)resources.GetObject("searchBtn.Image");
             searchBtn.Location = new Point(636, 24);
             searchBtn.Margin = new Padding(3, 4, 3, 4);
             searchBtn.Name = "searchBtn";
-            searchBtn.Size = new Size(86, 37);
+            searchBtn.Size = new Size(86, 33);
             searchBtn.TabIndex = 2;
             searchBtn.Text = "Поиск";
             searchBtn.UseVisualStyleBackColor = true;
+            searchBtn.Click += searchBtn_Click_1;
             // 
             // newBookPage
             // 
@@ -433,7 +487,7 @@ namespace BookShop
             newBookPage.Margin = new Padding(3, 4, 3, 4);
             newBookPage.Name = "newBookPage";
             newBookPage.Padding = new Padding(3, 4, 3, 4);
-            newBookPage.Size = new Size(906, 562);
+            newBookPage.Size = new Size(1077, 574);
             newBookPage.TabIndex = 1;
             newBookPage.Text = "Заказать книгу";
             newBookPage.UseVisualStyleBackColor = true;
@@ -471,7 +525,7 @@ namespace BookShop
             newBookTablePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 53F));
             newBookTablePanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 53F));
             newBookTablePanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            newBookTablePanel.Size = new Size(900, 554);
+            newBookTablePanel.Size = new Size(1071, 566);
             newBookTablePanel.TabIndex = 0;
             // 
             // idField
@@ -544,7 +598,7 @@ namespace BookShop
             authorField.Margin = new Padding(17, 4, 3, 4);
             authorField.MaximumSize = new Size(1142, 32);
             authorField.Name = "authorField";
-            authorField.Size = new Size(663, 32);
+            authorField.Size = new Size(834, 32);
             authorField.TabIndex = 3;
             // 
             // bookNameField
@@ -554,7 +608,7 @@ namespace BookShop
             bookNameField.Margin = new Padding(17, 4, 3, 4);
             bookNameField.MaximumSize = new Size(1142, 32);
             bookNameField.Name = "bookNameField";
-            bookNameField.Size = new Size(663, 32);
+            bookNameField.Size = new Size(834, 32);
             bookNameField.TabIndex = 0;
             // 
             // bookNameLabel
@@ -596,16 +650,17 @@ namespace BookShop
             flowLayoutPanel1.Location = new Point(197, 375);
             flowLayoutPanel1.Margin = new Padding(3, 4, 17, 4);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Size = new Size(663, 148);
+            flowLayoutPanel1.Size = new Size(834, 160);
             flowLayoutPanel1.TabIndex = 12;
             // 
             // createBookBtn
             // 
             createBookBtn.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            createBookBtn.Image = (Image)resources.GetObject("createBookBtn.Image");
             createBookBtn.Location = new Point(17, 4);
             createBookBtn.Margin = new Padding(17, 4, 3, 4);
             createBookBtn.Name = "createBookBtn";
-            createBookBtn.Size = new Size(113, 80);
+            createBookBtn.Size = new Size(129, 56);
             createBookBtn.TabIndex = 0;
             createBookBtn.Text = "Заказать";
             createBookBtn.UseVisualStyleBackColor = true;
@@ -614,24 +669,26 @@ namespace BookShop
             // 
             generateBookBtn.Anchor = AnchorStyles.None;
             generateBookBtn.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 204);
-            generateBookBtn.Location = new Point(150, 4);
+            generateBookBtn.Image = (Image)resources.GetObject("generateBookBtn.Image");
+            generateBookBtn.Location = new Point(166, 4);
             generateBookBtn.Margin = new Padding(17, 4, 3, 4);
             generateBookBtn.Name = "generateBookBtn";
-            generateBookBtn.Size = new Size(179, 80);
+            generateBookBtn.Size = new Size(193, 56);
             generateBookBtn.TabIndex = 1;
             generateBookBtn.Text = "Сгенерировать";
             generateBookBtn.UseVisualStyleBackColor = true;
+            generateBookBtn.Click += generateBookBtn_Click_1;
             // 
             // ganreComboBox
             // 
             ganreComboBox.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             ganreComboBox.FormattingEnabled = true;
             ganreComboBox.Items.AddRange(new object[] { "Роман", "Повесть", "Рассказ", "Проза", "Эпос", "Лирика", "Драма", "Фантастика", "Фэнтези", "Детектив", "Триллер", "Любовный роман", "Биография", "Психология", "Научно-популярная литература" });
-            ganreComboBox.Location = new Point(211, 169);
+            ganreComboBox.Location = new Point(211, 171);
             ganreComboBox.Margin = new Padding(17, 4, 3, 4);
             ganreComboBox.MaximumSize = new Size(1142, 0);
             ganreComboBox.Name = "ganreComboBox";
-            ganreComboBox.Size = new Size(663, 33);
+            ganreComboBox.Size = new Size(834, 33);
             ganreComboBox.TabIndex = 5;
             // 
             // customersPage
@@ -641,7 +698,7 @@ namespace BookShop
             customersPage.Margin = new Padding(3, 4, 3, 4);
             customersPage.Name = "customersPage";
             customersPage.Padding = new Padding(3, 4, 3, 4);
-            customersPage.Size = new Size(906, 562);
+            customersPage.Size = new Size(1077, 574);
             customersPage.TabIndex = 3;
             customersPage.Text = "Покупатели";
             customersPage.UseVisualStyleBackColor = true;
@@ -661,7 +718,7 @@ namespace BookShop
             customersMainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 80F));
             customersMainPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             customersMainPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 53F));
-            customersMainPanel.Size = new Size(900, 554);
+            customersMainPanel.Size = new Size(1071, 566);
             customersMainPanel.TabIndex = 0;
             // 
             // lblNoCustomers
@@ -671,7 +728,7 @@ namespace BookShop
             lblNoCustomers.ForeColor = Color.Gray;
             lblNoCustomers.Location = new Point(3, 0);
             lblNoCustomers.Name = "lblNoCustomers";
-            lblNoCustomers.Size = new Size(894, 80);
+            lblNoCustomers.Size = new Size(1065, 80);
             lblNoCustomers.TabIndex = 0;
             lblNoCustomers.Text = "У Вас пока нет ни одного покупателя";
             lblNoCustomers.TextAlign = ContentAlignment.MiddleCenter;
@@ -683,7 +740,7 @@ namespace BookShop
             customersQueuePanel.Location = new Point(3, 84);
             customersQueuePanel.Margin = new Padding(3, 4, 3, 4);
             customersQueuePanel.Name = "customersQueuePanel";
-            customersQueuePanel.Size = new Size(894, 413);
+            customersQueuePanel.Size = new Size(1065, 425);
             customersQueuePanel.TabIndex = 1;
             // 
             // unsatisfiedLabel
@@ -691,9 +748,9 @@ namespace BookShop
             unsatisfiedLabel.Dock = DockStyle.Fill;
             unsatisfiedLabel.Font = new Font("Segoe UI", 10F);
             unsatisfiedLabel.ForeColor = Color.DarkRed;
-            unsatisfiedLabel.Location = new Point(3, 501);
+            unsatisfiedLabel.Location = new Point(3, 513);
             unsatisfiedLabel.Name = "unsatisfiedLabel";
-            unsatisfiedLabel.Size = new Size(894, 53);
+            unsatisfiedLabel.Size = new Size(1065, 53);
             unsatisfiedLabel.TabIndex = 2;
             unsatisfiedLabel.Text = "Недовольных клиентов: 0/3";
             unsatisfiedLabel.TextAlign = ContentAlignment.MiddleRight;
@@ -953,7 +1010,7 @@ namespace BookShop
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(914, 600);
+            ClientSize = new Size(1085, 612);
             Controls.Add(bookFormTabControl);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(3, 4, 3, 4);

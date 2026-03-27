@@ -696,5 +696,15 @@ namespace BookShop
                 System.Reflection.BindingFlags.NonPublic,
                 null, control, new object[] { true });
         }
+
+        private void searchBtn_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void generateBookBtn_Click_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }
