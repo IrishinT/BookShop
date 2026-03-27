@@ -36,6 +36,65 @@ namespace BookShopLibrary
 
         public Book Clone() => new Book(Id, Title, Author, Genre, Pages, BaseCost, PartNumber);
 
+        /// <summary>
+        /// Продажа книги
+        /// </summary>
+        /// <returns>Цена продажи книги</returns>
+        public decimal Sell()
+        {
+            return Price;
+        }
+
+        /// <summary>
+        /// Генерация случайной книги из файлов
+        /// </summary>
+        public static Book GenerateRandom(int id)
+        {
+            try
+            {
+                var basePath = AppDomain.CurrentDomain.BaseDirectory;
+                var titles = System.IO.File.ReadAllLines(System.IO.Path.Combine(basePath, "titles.txt"));
+                var authors = System.IO.File.ReadAllLines(System.IO.Path.Combine(basePath, "authors.txt"));
+                var genres = System.IO.File.ReadAllLines(System.IO.Path.Combine(basePath, "genres.txt"));
+
+                var random = new Random();
+                string title = titles[random.Next(titles.Length)];
+                string author = authors[random.Next(authors.Length)];
+                string genre = genres[random.Next(genres.Length)];
+                int pages = random.Next(100, 1000);
+                decimal baseCost = random.Next(100, 1000);
+
+                return new Book(id, title, author, genre, pages, baseCost);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Ошибка при генерации книги: " + ex.Message, ex);
+            }
+        }
+
+        /// <summary>
+        /// Генерация случайной книги из переданных данных
+        /// </summary>
+        public static Book GenerateRandom(int id, List<(string Title, string Author)> bookAuthorPairs, List<string> genres)
+        {
+            var random = new Random();
+            
+            if (bookAuthorPairs == null || bookAuthorPairs.Count == 0)
+                throw new ArgumentException("Список пар книга-автор не может быть пустым", nameof(bookAuthorPairs));
+            
+            if (genres == null || genres.Count == 0)
+                throw new ArgumentException("Список жанров не может быть пустым", nameof(genres));
+
+            var pair = bookAuthorPairs[random.Next(bookAuthorPairs.Count)];
+            string title = pair.Title;
+            string author = pair.Author;
+            string genre = genres[random.Next(genres.Count)];
+            int pages = random.Next(100, 1000);
+            decimal baseCost = random.Next(100, 1000);
+
+            return new Book(id, title, author, genre, pages, baseCost);
+        }
+
         public override string ToString() => $"{Id}: {DisplayTitle} - {Author} ({Genre}) | Себестоимость: {BaseCost:C}";
     }
 }

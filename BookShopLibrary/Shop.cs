@@ -11,15 +11,96 @@ namespace BookShopLibrary
         public int MaxShelves { get; private set; }
 
         public IReadOnlyList<BookShelf> Shelves => shelves.AsReadOnly();
+        
+        public int ShelfCount => shelves.Count;
+        public bool CanAddShelf => shelves.Count < MaxShelves;
+        public int TotalBooksCount => shelves.Sum(s => s.CurrentCount);
 
         public Shop(decimal initialBalance, int maxShelves)
         {
-            Balance = initialBalance; MaxShelves = maxShelves;
+            if (maxShelves <= 0)
+                throw new ArgumentException("Максимальное количество шкафов должно быть больше нуля", nameof(maxShelves));
+            
+            Balance = initialBalance; 
+            MaxShelves = maxShelves;
         }
 
         public void AddToBalance(decimal amount) => Balance += amount;
         
         public List<BookShelf> GetShelves() => shelves.ToList();
+
+        public void AddBookShelf(BookShelf shelf)
+        {
+            if (shelf == null)
+                throw new ArgumentNullException(nameof(shelf));
+            
+            if (shelves.Count >= MaxShelves)
+                throw new InvalidOperationException("Достигнуто максимальное количество шкафов");
+            
+            shelves.Add(shelf);
+        }
+
+        public BookShelf CreateBookShelf(int id, string genre, int capacity)
+        {
+            var shelf = new BookShelf(id, genre, capacity);
+            AddBookShelf(shelf);
+            return shelf;
+        }
+
+        public bool RemoveBookShelf(int shelfId)
+        {
+            var shelf = shelves.FirstOrDefault(s => s.Id == shelfId);
+            if (shelf == null)
+                return false;
+            
+            if (!shelf.IsEmpty)
+                throw new InvalidOperationException("Нельзя удалить непустой шкаф");
+            
+            return shelves.Remove(shelf);
+        }
+
+        public Book? FindBookByTitle(string title)
+        {
+            foreach (var shelf in shelves)
+            {
+                var book = shelf.FindBookByTitle(title);
+                if (book != null)
+                    return book;
+            }
+            return null;
+        }
+
+        public Book? FindBookById(int bookId)
+        {
+            foreach (var shelf in shelves)
+            {
+                var book = shelf.FindBookById(bookId);
+                if (book != null)
+                    return book;
+            }
+            return null;
+        }
+
+        public Dictionary<BookShelf, List<Book>> GetAllBooks()
+        {
+            var result = new Dictionary<BookShelf, List<Book>>();
+            foreach (var shelf in shelves)
+            {
+                result[shelf] = shelf.GetAllBooks();
+            }
+            return result;
+        }
+
+        public decimal SellBook(int shelfId, int bookId)
+        {
+            var shelf = shelves.FirstOrDefault(s => s.Id == shelfId);
+            if (shelf == null)
+                throw new InvalidOperationException("Шкаф не найден");
+            
+            var price = shelf.SellBook(bookId);
+            Balance += price;
+            return price;
+        }
 
         // Проверка наличия места (КРИТИЧНО ДЛЯ ОЧЕРЕДИ ПО ТЗ)
         public bool CanFitBook(Book book)
