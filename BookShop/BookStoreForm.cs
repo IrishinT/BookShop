@@ -1,3 +1,4 @@
+#nullable disable
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,641 +9,416 @@ using BookShopLibrary;
 
 namespace BookShop
 {
+    /// <summary>
+    /// Главная форма приложения "Книжный Магнат". 
+    /// Отвечает за отрисовку интерфейса и передачу действий пользователя в ядро игры (GameManager).
+    /// </summary>
     public partial class BookStoreForm : Form
     {
-        private Shop shop;
-        private List<BookShelf> bookShelves;
-        private int nextId = 1;
+        /// <summary> Главный менеджер игровой логики </summary>
+        private GameManager _gameManager;
+
+        /// <summary> Основной игровой таймер (тик = 1 секунда) </summary>
+        private System.Windows.Forms.Timer _mainTimer;
+
+        /// <summary> Счётчик прошедших секунд для генерации событий </summary>
+        private int _ticksElapsed = 0;
+
+        /// <summary> Интервал появления новых поставок (в секундах) </summary>
+        private int _deliveryIntervalSec;
+
+        /// <summary> Интервал появления новых покупателей (в секундах) </summary>
+        private int _customerIntervalSec;
+
         private readonly string genresFile = "genres.txt";
         private readonly string bookAuthorPairsFile = "book-author-pairs.txt";
 
-        private List<(string Title, string Author)> _bookAuthorPairs = new List<(string, string)>();
-        private List<string> _genres = new List<string>();
-
-        private string gameDifficulty;
-
-        // Таймер и очередь поставок
-        private System.Windows.Forms.Timer deliveryTimer;
-        private Queue<Delivery> deliveriesQueue = new Queue<Delivery>();
-        private int deliveryInterval = 10000;
-
-        public BookStoreForm()
+        /// <summary>
+        /// Конструктор формы магазина. Инициализирует игру, настраивает таймеры и интерфейс.
+        /// </summary>
+        /// <param name="difficulty">Выбранный уровень сложности (по умолчанию "Нормальный")</param>
+        public BookStoreForm(string difficulty = "Нормальный")
         {
             InitializeComponent();
-
             this.DoubleBuffered = true;
-            searchTypeCmb.SelectedIndex = 0;
+            EnableDoubleBuffering(bookFormTabControl);
 
-            SubscribeToEvents();
-            InitializeShop();
-            InitializeFormControls();
+            // 1. Создаем файлы, чтобы DatabaseManager мог успешно запуститься
             CreateDataFilesIfNotExist();
-            LoadGenresFromFile();
-            LoadBookAuthorPairs();
 
-            deliveryTimer = new System.Windows.Forms.Timer();
-            deliveryTimer.Tick += DeliveryTimer_Tick;
-
-            gameDifficulty = "Нормальный";
-            ConfigureGameDifficulty();
-        }
-
-        public BookStoreForm(string difficulty)
-        {
-            InitializeComponent();
-
-            this.DoubleBuffered = true;
-            searchTypeCmb.SelectedIndex = 0;
-
-            SubscribeToEvents();
-            InitializeShop();
-            InitializeFormControls();
-            CreateDataFilesIfNotExist();
-            LoadGenresFromFile();
-            LoadBookAuthorPairs();
-
-            deliveryTimer = new System.Windows.Forms.Timer();
-            deliveryTimer.Tick += DeliveryTimer_Tick;
-
-            gameDifficulty = difficulty;
-            ConfigureGameDifficulty();
-        }
-
-        private void ConfigureGameDifficulty()
-        {
-            switch (gameDifficulty)
-            {
-                case "Лёгкий":
-                    deliveryInterval = 15000;
-                    if (shop != null) shop.AddToBalance(2000);
-                    MessageBox.Show("Запущен ЛЁГКИЙ режим!\n\n" +
-                        "• Стартовый баланс: 2000 руб.\n" +
-                        "• Книги приходят реже (15 сек)\n" +
-                        "• Покупатели появляются реже (20 сек)\n" +
-                        "• Очередь до 5 покупателей",
-                        "Режим игры", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    break;
-
-                case "Нормальный":
-                    deliveryInterval = 10000;
-                    if (shop != null) shop.AddToBalance(1000);
-                    MessageBox.Show("Запущен НОРМАЛЬНЫЙ режим!\n\n" +
-                        "• Стартовый баланс: 1000 руб.\n" +
-                        "• Книги приходят каждые 10 сек\n" +
-                        "• Покупатели каждые 15 сек\n" +
-                        "• Очередь до 4 покупателей",
-                        "Режим игры", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    break;
-
-                case "Сложный":
-                    deliveryInterval = 5000;
-                    if (shop != null) shop.AddToBalance(500);
-                    MessageBox.Show("Запущен СЛОЖНЫЙ режим!\n\n" +
-                        "• Стартовый баланс: 500 руб.\n" +
-                        "• Книги приходят каждые 5 сек\n" +
-                        "• Покупатели каждые 8 сек\n" +
-                        "• Очередь до 3 покупателей",
-                        "Режим игры", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    break;
-
-                default:
-                    gameDifficulty = "Нормальный";
-                    deliveryInterval = 10000;
-                    if (shop != null) shop.AddToBalance(1000);
-                    break;
-            }
-
-            deliveryTimer.Interval = deliveryInterval;
-            deliveryTimer.Start();
-            UpdateBalanceDisplay();
-        }
-
-        // ========== МЕТОДЫ ДЛЯ ПОСТАВОК ==========
-
-        private void DeliveryTimer_Tick(object sender, EventArgs e)
-        {
+            // 2. Инициализируем ядро игры
             try
             {
-                if (_bookAuthorPairs.Count == 0 || _genres.Count == 0)
-                    return;
-
-                Random rand = new Random();
-                var pair = _bookAuthorPairs[rand.Next(_bookAuthorPairs.Count)];
-                var genre = _genres[rand.Next(_genres.Count)];
-
-                // Адекватное количество страниц: 50-1000
-                int pages = rand.Next(50, 1001);
-
-                // Адекватная цена: 50 руб + 0.5 руб за страницу, с вариацией ±15%
-                // 100 стр = ~100 руб, 500 стр = ~300 руб, 1000 стр = ~550 руб
-                decimal basePrice = 50 + (pages * 0.5m);
-                decimal variation = (decimal)(rand.NextDouble() * 0.3 - 0.15);
-                decimal price = Math.Round(basePrice * (1 + variation), 0);
-
-                // Ограничиваем цену
-                if (price < 30) price = 30;
-                if (price > 800) price = 800;
-
-                Book randomBook = new Book(nextId, pair.Title, pair.Author, genre, pages, price);
-                Delivery delivery = new Delivery(randomBook, false);
-
-                AddDelivery(delivery);
-
-                nextId++;
-                idField.Text = nextId.ToString();
+                _gameManager = new GameManager(difficulty);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при генерации поставки: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Ошибка инициализации игры: {ex.Message}");
+                return;
             }
+
+            // 3. Настройка UI и интервалов
+            ConfigureGameDifficulty(difficulty);
+            InitializeFormControls();
+            SubscribeToEvents();
+
+            // 4. Запуск игрового времени
+            _mainTimer = new System.Windows.Forms.Timer { Interval = 1000 };
+            _mainTimer.Tick += MainTimer_Tick;
+            _mainTimer.Start();
+
+            UpdateUI();
         }
 
-        private void AddDelivery(Delivery delivery)
+        /// <summary>
+        /// Настраивает интервалы появления событий в зависимости от сложности игры.
+        /// </summary>
+        private void ConfigureGameDifficulty(string difficulty)
         {
-            deliveriesQueue.Enqueue(delivery);
-
-            if (!bookFormTabControl.TabPages.Contains(deliveriesPage))
+            switch (difficulty)
             {
-                bookFormTabControl.TabPages.Add(deliveriesPage);
+                case "Лёгкий":
+                    _deliveryIntervalSec = 15;
+                    _customerIntervalSec = 20;
+                    MessageBox.Show("Запущен ЛЁГКИЙ режим!\n\n• Стартовый баланс: 2000 руб.\n• Книги приходят реже (15 сек)\n• Покупатели реже (20 сек)\n• Очередь до 5 чел.", "Режим игры", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    break;
+                case "Сложный":
+                    _deliveryIntervalSec = 5;
+                    _customerIntervalSec = 8;
+                    MessageBox.Show("Запущен СЛОЖНЫЙ режим!\n\n• Стартовый баланс: 500 руб.\n• Книги приходят часто (5 сек)\n• Покупатели часто (8 сек)\n• Очередь до 3 чел.", "Режим игры", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    break;
+                default: // Нормальный
+                    _deliveryIntervalSec = 10;
+                    _customerIntervalSec = 15;
+                    MessageBox.Show("Запущен НОРМАЛЬНЫЙ режим!\n\n• Стартовый баланс: 1000 руб.\n• Книги приходят каждые 10 сек\n• Покупатели каждые 15 сек\n• Очередь до 4 чел.", "Режим игры", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    break;
             }
-
-            deliveriesPage.Visible = true;
-
-            if (deliveriesQueue.Count == 1)
-                ShowCurrentDelivery();
         }
 
+        /// <summary>
+        /// Магия на уровне Windows API: заставляет всю форму (и все дочерние элементы)
+        /// рисоваться в оперативной памяти ДО того, как они будут выведены на экран.
+        /// Полностью убивает лаги, черные квадраты и мерцания при разворачивании на весь экран!
+        /// </summary>
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                // Включаем флаг WS_EX_COMPOSITED (0x02000000)
+                cp.ExStyle |= 0x02000000;
+                return cp;
+            }
+        }
+
+        // Игровой цикл
+
+        /// <summary>
+        /// Обработчик тика игрового таймера. Вызывается каждую секунду.
+        /// Обновляет время, генерирует покупателей и поставки, проверяет условия поражения.
+        /// </summary>
+        private void MainTimer_Tick(object sender, EventArgs e)
+        {
+            if (_gameManager.State != GameState.Playing)
+            {
+                _mainTimer.Stop();
+                MessageBox.Show(_gameManager.EndGameReason, _gameManager.State == GameState.Won ? "Победа!" : "Игра окончена", MessageBoxButtons.OK, _gameManager.State == GameState.Won ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
+                this.Close();
+                return;
+            }
+
+            _gameManager.TickSecond();
+            _ticksElapsed++;
+
+            // Генерация поставок и покупателей по таймеру
+            if (_ticksElapsed % _deliveryIntervalSec == 0)
+                _gameManager.GenerateRandomDelivery();
+
+            if (_ticksElapsed % _customerIntervalSec == 0)
+                _gameManager.GenerateCustomer();
+
+            UpdateUI();
+        }
+
+        // Обновления интерфейса
+
+        /// <summary>
+        /// Полностью обновляет визуальную часть окна: статус-бар в заголовке окна, баланс, списки шкафов.
+        /// </summary>
+        private void UpdateUI()
+        {
+            if (_gameManager == null) return;
+
+            if (balanceLb != null) balanceLb.Text = $"Баланс: {_gameManager.Shop.Balance:C}";
+
+            // Вывод статуса игры в заголовок окна
+            this.Text = $"Магнат | Время: {_gameManager.TimeRemainingSeconds}с | " +
+                        $"Очередь клиентов: {_gameManager.CustomerQueue.Count}/{_gameManager.MaxQueueSize} | " +
+                        $"Недовольные: {_gameManager.DissatisfiedCustomers}/{_gameManager.MaxDissatisfied}";
+
+            UpdateShelvesUI();
+            ShowCurrentDelivery();
+            UpdateCustomersTab();
+        }
+
+        /// <summary>
+        /// Обновляет выпадающий список со шкафами магазина.
+        /// </summary>
+        private void UpdateShelvesUI()
+        {
+            // Запоминаем текущий выбранный шкаф (текст)
+            string selectedShelfText = shelfSelectCmb.SelectedItem?.ToString();
+
+            shelfSelectCmb.Items.Clear();
+            foreach (var shelf in _gameManager.Shop.Shelves)
+            {
+                shelfSelectCmb.Items.Add($"Шкаф {shelf.Id} ({shelf.Genre})");
+            }
+
+            if (shelfSelectCmb.Items.Count > 0)
+            {
+                // Восстанавливаем выбор, если этот шкаф всё ещё существует
+                if (!string.IsNullOrEmpty(selectedShelfText) && shelfSelectCmb.Items.Contains(selectedShelfText))
+                    shelfSelectCmb.SelectedItem = selectedShelfText;
+                else
+                    shelfSelectCmb.SelectedIndex = 0;
+            }
+
+            UpdateBooksInShelf();
+        }
+
+        /// <summary>
+        /// Обновляет выпадающий список книг для выбранного шкафа.
+        /// </summary>
+        private void UpdateBooksInShelf()
+        {
+            // Запоминаем текущую выбранную книгу (текст)
+            string selectedBookText = bookSelectCmb.SelectedItem?.ToString();
+
+            bookSelectCmb.Items.Clear();
+            BookShelf selectedShelf = GetSelectedBookShelf();
+
+            if (selectedShelf != null)
+            {
+                var booksInShelf = selectedShelf.GetAllBooks();
+                foreach (var book in booksInShelf)
+                {
+                    bookSelectCmb.Items.Add($"{book.Id}: {book.DisplayTitle} - {book.Author}");
+                }
+
+                if (shelfCapacity != null)
+                {
+                    shelfCapacity.Text = $"Загруженность {booksInShelf.Count}/{selectedShelf.Capacity}";
+                    shelfCapacity.ForeColor = booksInShelf.Count >= selectedShelf.Capacity ? Color.Red : Color.Black;
+                }
+
+                // Восстанавливаем выбор книги
+                if (bookSelectCmb.Items.Count > 0)
+                {
+                    if (!string.IsNullOrEmpty(selectedBookText) && bookSelectCmb.Items.Contains(selectedBookText))
+                        bookSelectCmb.SelectedItem = selectedBookText;
+                    else
+                        bookSelectCmb.SelectedIndex = 0; // Автоматически выбираем первую книгу
+                }
+            }
+            else
+            {
+                if (shelfCapacity != null) shelfCapacity.Text = "Шкаф не выбран";
+            }
+        }
+
+        // Работа с поставками
+
+        /// <summary>
+        /// Отображает информацию о текущей поставке из очереди на вкладке доставок.
+        /// </summary>
         private void ShowCurrentDelivery()
         {
-            if (deliveriesQueue.Count == 0)
+            if (_gameManager.DeliveryQueue.Count == 0)
             {
                 deliveriesPage.Visible = false;
                 if (bookFormTabControl.TabPages.Contains(deliveriesPage))
-                {
                     bookFormTabControl.TabPages.Remove(deliveriesPage);
-                }
+
                 ClearDeliveryFields();
                 return;
             }
 
-            Delivery current = deliveriesQueue.Peek();
+            if (!bookFormTabControl.TabPages.Contains(deliveriesPage))
+                bookFormTabControl.TabPages.Add(deliveriesPage);
 
+            deliveriesPage.Visible = true;
+
+            Delivery current = _gameManager.DeliveryQueue.Peek();
             deliveryTitleField.Text = current.Book.DisplayTitle;
             deliveryAuthorField.Text = current.Book.Author;
             deliveryGenreField.Text = current.Book.Genre;
-            deliveryPriceField.Text = current.Book.Price.ToString("C");
+            deliveryPriceField.Text = current.Book.BaseCost.ToString("C");
             deliveryPagesField.Text = current.Book.Pages.ToString();
         }
 
+        /// <summary>
+        /// Очищает текстовые поля на вкладке доставок.
+        /// </summary>
         private void ClearDeliveryFields()
         {
-            deliveryTitleField.Text = "";
-            deliveryAuthorField.Text = "";
-            deliveryGenreField.Text = "";
-            deliveryPriceField.Text = "";
-            deliveryPagesField.Text = "";
+            deliveryTitleField.Text = ""; deliveryAuthorField.Text = "";
+            deliveryGenreField.Text = ""; deliveryPriceField.Text = ""; deliveryPagesField.Text = "";
         }
 
-        private void AcceptCurrentDelivery()
-        {
-            if (deliveriesQueue.Count == 0) return;
-
-            Delivery delivery = deliveriesQueue.Peek();
-
-            if (shop.Balance < delivery.Book.Price)
-            {
-                MessageBox.Show($"Недостаточно средств! Нужно: {delivery.Book.Price:C}, доступно: {shop.Balance:C}",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            shop.AddToBalance(-delivery.Book.Price);
-
-            if (shop.TryAddBook(delivery.Book))
-            {
-                MessageBox.Show($"Книга '{delivery.Book.DisplayTitle}' успешно принята!\nСписано: {delivery.Book.Price:C}",
-                    "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                // Обновляем список шкафов из магазина
-                bookShelves = shop.GetShelves();
-
-                UpdateBalanceDisplay();
-                UpdateShelfComboBox();
-                UpdateBooksInShelf();
-
-                deliveriesQueue.Dequeue();
-                ShowCurrentDelivery();
-            }
-            else
-            {
-                shop.AddToBalance(delivery.Book.Price);
-                MessageBox.Show($"Нет места для книги '{delivery.Book.DisplayTitle}'!",
-                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-        }
-
-        private void RejectCurrentDelivery()
-        {
-            if (deliveriesQueue.Count == 0) return;
-
-            Delivery delivery = deliveriesQueue.Dequeue();
-
-            MessageBox.Show($"Поставка '{delivery.Book.DisplayTitle}' отклонена.",
-                "Отказ", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-            ShowCurrentDelivery();
-        }
-
+        /// <summary>
+        /// Обрабатывает нажатие кнопки "Принять поставку".
+        /// </summary>
         private void BtnAcceptDelivery_Click(object sender, EventArgs e)
         {
-            try { AcceptCurrentDelivery(); }
-            catch (Exception ex) { MessageBox.Show($"Ошибка: {ex.Message}"); }
+            try
+            {
+                string result = _gameManager.ProcessDelivery(accept: true, markAsError: false);
+                MessageBox.Show(result, "Поставка", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                UpdateUI();
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
+        /// <summary>
+        /// Обрабатывает нажатие кнопки "Отклонить поставку" (отбраковка).
+        /// </summary>
         private void BtnRejectDelivery_Click(object sender, EventArgs e)
         {
-            try { RejectCurrentDelivery(); }
-            catch (Exception ex) { MessageBox.Show($"Ошибка: {ex.Message}"); }
-        }
-
-        // ========== ВАШИ СУЩЕСТВУЮЩИЕ МЕТОДЫ ==========
-
-        private void SubscribeToEvents()
-        {
-            createBookBtn.Click += CreateBookBtn_Click;
-            generateBookBtn.Click += GenerateBookBtn_Click;
-            searchBtn.Click += SearchBtn_Click;
-            bookSellBtn.Click += BookSellBtn_Click;
-
-            shelfSelectCmb.SelectedIndexChanged += ShelfSelectCmb_SelectedIndexChanged;
-            bookSelectCmb.SelectedIndexChanged += BookSelectCmb_SelectedIndexChanged;
-
-            searchField.KeyPress += SearchField_KeyPress;
-            bookNameField.KeyPress += TextBox_KeyPress;
-            authorField.KeyPress += TextBox_KeyPress;
-
-            btnAcceptDelivery.Click += BtnAcceptDelivery_Click;
-            btnRejectDelivery.Click += BtnRejectDelivery_Click;
-        }
-
-        private void bookInfoLayoutPanel_Paint(object sender, PaintEventArgs e) { }
-
-        private void InitializeShop()
-        {
             try
             {
-                shop = new Shop(0, 5);
-                // Получаем шкафы из магазина
-                bookShelves = shop.GetShelves();
-                UpdateShelfComboBox();
+                string result = _gameManager.ProcessDelivery(accept: false, markAsError: true);
+                MessageBox.Show(result, "Отказ от поставки", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                UpdateUI();
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при инициализации магазина: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
-        private void InitializeFormControls()
-        {
-            // Количество страниц
-            pagesCountNumbericUpDown.Minimum = 50;
-            pagesCountNumbericUpDown.Maximum = 1000;
-            pagesCountNumbericUpDown.Value = 200;
+        // Взаимодействие с книгами и покупателями
 
-            // Цена
-            priceNumbericUpDown.Minimum = 100;
-            priceNumbericUpDown.Maximum = 1500;
-            priceNumbericUpDown.DecimalPlaces = 0;
-            priceNumbericUpDown.Value = 100;
-
-            idField.Text = nextId.ToString();
-            UpdateBalanceDisplay();
-        }
-
-        private void CreateDataFilesIfNotExist()
-        {
-            try
-            {
-                if (!File.Exists(genresFile))
-                {
-                    File.WriteAllLines(genresFile, new string[] {
-                        "Роман", "Повесть", "Рассказ", "Проза", "Эпос",
-                        "Лирика", "Драма", "Фантастика", "Фэнтези", "Детектив",
-                        "Триллер", "Любовный роман", "Биография", "Психология", "Научно-популярная литература"
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при создании файлов данных: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void LoadGenresFromFile()
-        {
-            try
-            {
-                if (File.Exists(genresFile))
-                {
-                    string[] genres = File.ReadAllLines(genresFile);
-                    _genres.Clear();
-                    ganreComboBox.Items.Clear();
-                    foreach (string genre in genres)
-                    {
-                        if (!string.IsNullOrWhiteSpace(genre))
-                        {
-                            string trimmed = genre.Trim();
-                            _genres.Add(trimmed);
-                            ganreComboBox.Items.Add(trimmed);
-                        }
-                    }
-                }
-                else
-                {
-                    _genres = new List<string> { "Фантастика", "Детектив", "Роман", "Поэзия", "Драма" };
-                    ganreComboBox.Items.AddRange(_genres.ToArray());
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при загрузке жанров: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void LoadBookAuthorPairs()
-        {
-            try
-            {
-                string path = Path.Combine(Application.StartupPath, bookAuthorPairsFile);
-                if (File.Exists(path))
-                {
-                    var lines = File.ReadAllLines(path);
-                    foreach (var line in lines)
-                    {
-                        if (string.IsNullOrWhiteSpace(line)) continue;
-                        var parts = line.Split(';');
-                        if (parts.Length == 2)
-                        {
-                            _bookAuthorPairs.Add((parts[0].Trim(), parts[1].Trim()));
-                        }
-                    }
-                }
-                else
-                {
-                    CreateDefaultBookAuthorPairsFile();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при загрузке пар книга-автор: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void CreateDefaultBookAuthorPairsFile()
-        {
-            try
-            {
-                string[] defaultPairs = new string[]
-                {
-                    "Бесы;Достоевский",
-                    "Преступление и наказание;Достоевский",
-                    "Война и мир;Толстой",
-                    "Анна Каренина;Толстой",
-                    "Мастер и Маргарита;Булгаков",
-                    "Собачье сердце;Булгаков",
-                    "Евгений Онегин;Пушкин",
-                    "Капитанская дочка;Пушкин",
-                    "Герой нашего времени;Лермонтов",
-                    "Мцыри;Лермонтов"
-                };
-
-                File.WriteAllLines(bookAuthorPairsFile, defaultPairs);
-
-                foreach (var line in defaultPairs)
-                {
-                    var parts = line.Split(';');
-                    _bookAuthorPairs.Add((parts[0], parts[1]));
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Не удалось создать файл: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private bool ValidateBookFields()
-        {
-            if (string.IsNullOrWhiteSpace(bookNameField.Text))
-            {
-                MessageBox.Show("Введите название книги", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(authorField.Text))
-            {
-                MessageBox.Show("Введите автора книги", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-
-            if (ganreComboBox.SelectedItem == null)
-            {
-                MessageBox.Show("Выберите жанр книги", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-
-            if (pagesCountNumbericUpDown.Value <= 0)
-            {
-                MessageBox.Show("Количество страниц должно быть больше 0", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-
-            if (priceNumbericUpDown.Value <= 0)
-            {
-                MessageBox.Show("Цена книги должна быть больше 0", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-
-            return true;
-        }
-
-        private void TextBox_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (char.IsDigit(e.KeyChar))
-            {
-                e.Handled = true;
-                MessageBox.Show("Поле не должно содержать цифры", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-        }
-
-        private void SearchField_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (searchTypeCmb.SelectedIndex == 1)
-            {
-                if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
-                {
-                    e.Handled = true;
-                }
-            }
-        }
-
-        private string GetUniqueTitle(string baseTitle)
-        {
-            string currentAuthor = authorField.Text.Trim();
-
-            bool isSequel = bookShelves.Any(shelf =>
-                shelf.GetAllBooks().Any(b =>
-                    b.Title.Equals(baseTitle, StringComparison.OrdinalIgnoreCase) &&
-                    b.Author.Equals(currentAuthor, StringComparison.OrdinalIgnoreCase)));
-
-            if (isSequel)
-            {
-                return baseTitle;
-            }
-
-            string uniqueTitle = baseTitle;
-            int suffix = 2;
-
-            while (bookShelves.Any(shelf =>
-                shelf.GetAllBooks().Any(b =>
-                    b.Title.Equals(uniqueTitle, StringComparison.OrdinalIgnoreCase))))
-            {
-                uniqueTitle = $"{baseTitle} {suffix}";
-                suffix++;
-            }
-
-            return uniqueTitle;
-        }
-
+        /// <summary>
+        /// Обрабатывает нажатие кнопки "Создать/Заказать книгу".
+        /// </summary>
         private void CreateBookBtn_Click(object sender, EventArgs e)
         {
             try
             {
                 if (!ValidateBookFields()) return;
 
-                string selectedGenre = ganreComboBox.SelectedItem.ToString();
+                string title = bookNameField.Text.Trim();
+                string author = authorField.Text.Trim();
+                string genre = ganreComboBox.SelectedItem.ToString();
+                int pages = (int)pagesCountNumbericUpDown.Value;
+                decimal cost = priceNumbericUpDown.Value;
 
-                string baseTitle = bookNameField.Text.Trim();
-                string uniqueTitle = GetUniqueTitle(baseTitle);
-                if (uniqueTitle != baseTitle)
-                {
-                    bookNameField.Text = uniqueTitle;
-                }
+                _gameManager.OrderBook(title, author, genre, pages, cost);
 
-                BookShelf targetShelf = bookShelves.FirstOrDefault(s =>
-                    s.Genre == selectedGenre && s.CurrentCount < s.Capacity);
-
-                if (targetShelf == null)
-                {
-                    BookShelf emptyShelf = bookShelves.FirstOrDefault(s => s.CurrentCount == 0);
-                    if (emptyShelf != null)
-                    {
-                        emptyShelf.ChangeGenre(selectedGenre);
-                        targetShelf = emptyShelf;
-                    }
-                }
-
-                if (targetShelf == null)
-                {
-                    if (bookShelves.Count < shop.MaxShelves)
-                    {
-                        int newShelfId = bookShelves.Count > 0 ? bookShelves.Max(s => s.Id) + 1 : 1;
-                        targetShelf = new BookShelf(newShelfId, selectedGenre, 10);
-                        bookShelves.Add(targetShelf);
-                        shop.AddBookShelf(targetShelf);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Все шкафы заняты. Освободите место для нового жанра.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
-                    }
-                }
-
-                if (targetShelf.CurrentCount >= targetShelf.Capacity)
-                {
-                    MessageBox.Show($"Шкаф переполнен! Максимум: {targetShelf.Capacity}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                Book newBook = new Book(
-                    nextId,
-                    uniqueTitle,
-                    authorField.Text.Trim(),
-                    selectedGenre,
-                    (int)pagesCountNumbericUpDown.Value,
-                    priceNumbericUpDown.Value
-                );
-
-                if (targetShelf.AddBook(newBook))
-                {
-                    nextId++;
-                    idField.Text = nextId.ToString();
-
-                    ClearNewBookFields();
-                    UpdateShelfComboBox();
-                    UpdateBooksInShelf();
-
-                    MessageBox.Show($"Книга '{newBook.DisplayTitle}' успешно добавлена!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Книга заказана! Ожидайте доставку в очереди.", "Заказ", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ClearNewBookFields();
+                UpdateUI();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при создании книги: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Ошибка заказа: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
+        /// <summary>
+        /// Автоматическая генерация случайных полей для книги (вспомогательная кнопка).
+        /// </summary>
         private void GenerateBookBtn_Click(object sender, EventArgs e)
         {
             try
             {
-                if (_bookAuthorPairs.Count == 0)
+                if (DatabaseManager.BookAuthorPairs.Count == 0 || DatabaseManager.Genres.Count == 0)
                 {
-                    MessageBox.Show("Не загружены данные о книгах! Проверьте файл book-author-pairs.txt",
-                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("База данных пуста!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
-                if (_genres.Count == 0)
-                {
-                    MessageBox.Show("Не загружены данные о жанрах!",
-                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
+                Random rand = new Random();
+                var pair = DatabaseManager.BookAuthorPairs[rand.Next(DatabaseManager.BookAuthorPairs.Count)];
+                string genre = DatabaseManager.Genres[rand.Next(DatabaseManager.Genres.Count)];
 
-                Book generatedBook = Book.GenerateRandom(nextId, _bookAuthorPairs, _genres);
+                bookNameField.Text = pair.Title;
+                authorField.Text = pair.Author;
+                ganreComboBox.SelectedItem = genre;
 
-                generatedBook.Title = GetUniqueTitle(generatedBook.Title);
-
-                bookNameField.Text = generatedBook.Title;
-                authorField.Text = generatedBook.Author;
-
-                for (int i = 0; i < ganreComboBox.Items.Count; i++)
-                {
-                    if (ganreComboBox.Items[i].ToString() == generatedBook.Genre)
-                    {
-                        ganreComboBox.SelectedIndex = i;
-                        break;
-                    }
-                }
-
-                pagesCountNumbericUpDown.Value = generatedBook.Pages;
-                priceNumbericUpDown.Value = generatedBook.Price;
+                pagesCountNumbericUpDown.Value = rand.Next(50, 800);
+                priceNumbericUpDown.Value = rand.Next(100, 1000);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при генерации книги: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Ошибка генерации: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
+        /// <summary>
+        /// Обрабатывает нажатие кнопки "Продать книгу".
+        /// </summary>
+        private void BookSellBtn_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (bookSelectCmb.SelectedItem == null)
+                {
+                    MessageBox.Show("Выберите книгу для продажи", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                int bookId = ExtractId(bookSelectCmb.SelectedItem.ToString());
+                BookShelf shelf = GetSelectedBookShelf();
+                Book bookToSell = shelf?.FindBookById(bookId);
+
+                if (bookToSell == null) return;
+
+                if (_gameManager.CustomerQueue.Count > 0)
+                {
+                    Customer customer = _gameManager.CustomerQueue.Peek();
+
+                    // Устанавливаем наценку 10% от базовой цены
+                    decimal sellPrice = bookToSell.BaseCost * 1.10m;
+
+                    var result = _gameManager.ServeCustomer(bookToSell, sellPrice);
+
+                    switch (result)
+                    {
+                        case CustomerServiceResult.Success:
+                            // Сделали сообщение более понятным для игрока!
+                            MessageBox.Show($"Себестоимость: {bookToSell.BaseCost:C}\nНаценка магазина: 10%\n\nКнига успешно продана клиенту за {sellPrice:C}!", "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            break;
+                        case CustomerServiceResult.PriceTooHigh:
+                            MessageBox.Show("Клиент ушел: слишком высокая цена (наценка > 15%)!", "Провал", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            break;
+                        case CustomerServiceResult.WrongBook:
+                            MessageBox.Show($"Клиент хотел другое: {customer}\nОн ушел недовольным.", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            break;
+                    }
+                }
+                else
+                {
+                    // Если клиентов нет - списываем по себестоимости
+                    decimal price = _gameManager.Shop.SellBookDirectly(shelf.Id, bookId);
+                    MessageBox.Show($"Очередь пуста.\nКнига продана напрямую по себестоимости: {price:C}.", "Прямая продажа", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+
+                ClearBookInfo();
+                UpdateUI();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при продаже: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Ищет книгу на полках по названию или по ID.
+        /// </summary>
         private void SearchBtn_Click(object sender, EventArgs e)
         {
             try
             {
                 string searchText = searchField.Text.Trim();
-
                 if (string.IsNullOrWhiteSpace(searchText))
                 {
                     MessageBox.Show("Введите текст для поиска", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -651,19 +427,19 @@ namespace BookShop
 
                 Book foundBook = null;
 
-                if (searchTypeCmb.SelectedIndex == 0)
+                if (searchTypeCmb.SelectedIndex == 0) // Поиск по названию
                 {
-                    foreach (var shelf in bookShelves)
+                    foreach (var shelf in _gameManager.Shop.Shelves)
                     {
                         foundBook = shelf.FindBookByTitle(searchText);
                         if (foundBook != null) break;
                     }
                 }
-                else
+                else // Поиск по ID
                 {
                     if (int.TryParse(searchText, out int id))
                     {
-                        foreach (var shelf in bookShelves)
+                        foreach (var shelf in _gameManager.Shop.Shelves)
                         {
                             foundBook = shelf.FindBookById(id);
                             if (foundBook != null) break;
@@ -678,15 +454,15 @@ namespace BookShop
 
                 if (foundBook != null)
                 {
-                    BookShelf foundShelf = bookShelves.FirstOrDefault(s => s.FindBookById(foundBook.Id) != null);
+                    BookShelf foundShelf = _gameManager.Shop.Shelves.FirstOrDefault(s => s.FindBookById(foundBook.Id) != null);
                     if (foundShelf != null)
                     {
-                        shelfSelectCmb.SelectedIndex = bookShelves.IndexOf(foundShelf);
+                        shelfSelectCmb.SelectedIndex = _gameManager.Shop.Shelves.ToList().IndexOf(foundShelf);
                         UpdateBooksInShelf();
 
                         int bookIndex = bookSelectCmb.Items.Cast<string>()
                                         .ToList()
-                                        .FindIndex(item => ExtractBookId(item) == foundBook.Id);
+                                        .FindIndex(item => ExtractId(item) == foundBook.Id);
                         if (bookIndex >= 0) bookSelectCmb.SelectedIndex = bookIndex;
 
                         DisplayBookInfo(foundBook);
@@ -703,167 +479,222 @@ namespace BookShop
             }
         }
 
-        private void BookSellBtn_Click(object sender, EventArgs e)
+        // Вспомогательные методы и события
+
+        /// <summary>
+        /// Пустой обработчик отрисовки панели. Нужен для дизайнера формы (иначе будет ошибка компиляции).
+        /// </summary>
+        private void bookInfoLayoutPanel_Paint(object sender, PaintEventArgs e) { }
+
+        /// <summary>
+        /// Подписка на события UI элементов.
+        /// </summary>
+        private void SubscribeToEvents()
         {
-            try
+            createBookBtn.Click += CreateBookBtn_Click;
+            generateBookBtn.Click += GenerateBookBtn_Click;
+            searchBtn.Click += SearchBtn_Click;
+            bookSellBtn.Click += BookSellBtn_Click;
+            btnAcceptDelivery.Click += BtnAcceptDelivery_Click;
+            btnRejectDelivery.Click += BtnRejectDelivery_Click;
+
+            shelfSelectCmb.SelectedIndexChanged += (s, e) => UpdateBooksInShelf();
+            bookSelectCmb.SelectedIndexChanged += BookSelectCmb_SelectedIndexChanged;
+
+            searchField.KeyPress += SearchField_KeyPress;
+            bookNameField.KeyPress += TextBox_KeyPress;
+            authorField.KeyPress += TextBox_KeyPress;
+
+            searchTypeCmb.SelectedIndex = 0;
+            if (DatabaseManager.Genres.Count > 0)
             {
-                if (bookSelectCmb.SelectedItem == null)
-                {
-                    MessageBox.Show("Выберите книгу для продажи", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                string selectedBookInfo = bookSelectCmb.SelectedItem.ToString();
-                int bookId = ExtractBookId(selectedBookInfo);
-
-                BookShelf targetShelf = GetSelectedBookShelf();
-                Book bookToSell = targetShelf?.FindBookById(bookId);
-
-                if (bookToSell != null && targetShelf != null)
-                {
-                    decimal price = shop.SellBook(targetShelf.Id, bookId);
-
-                    // Обновляем список шкафов после продажи
-                    bookShelves = shop.GetShelves();
-
-                    UpdateBalanceDisplay();
-                    UpdateShelfComboBox();
-                    UpdateBooksInShelf();
-                    ClearBookInfo();
-
-                    MessageBox.Show($"Книга '{bookToSell.DisplayTitle}' продана за {price:C}.",
-                        "Продажа", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
-                    MessageBox.Show("Книга не найдена!", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-            catch (InvalidOperationException ex)
-            {
-                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при продаже: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ganreComboBox.Items.Clear();
+                ganreComboBox.Items.AddRange(DatabaseManager.Genres.ToArray());
             }
         }
 
-        private void ShelfSelectCmb_SelectedIndexChanged(object sender, EventArgs e) => UpdateBooksInShelf();
+        /// <summary>
+        /// Инициализация ограничений для элементов управления вводом.
+        /// </summary>
+        private void InitializeFormControls()
+        {
+            pagesCountNumbericUpDown.Minimum = 50;
+            pagesCountNumbericUpDown.Maximum = 1000;
+            pagesCountNumbericUpDown.Value = 200;
 
+            priceNumbericUpDown.Minimum = 50;
+            priceNumbericUpDown.Maximum = 5000;
+            priceNumbericUpDown.DecimalPlaces = 0;
+            priceNumbericUpDown.Value = 200;
+        }
+
+        /// <summary>
+        /// Запрет ввода цифр в текстовые поля автора и названия.
+        /// </summary>
+        private void TextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+                MessageBox.Show("Поле не должно содержать цифры", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        /// <summary>
+        /// Валидация ввода в поле поиска (запрет букв при поиске по ID).
+        /// </summary>
+        private void SearchField_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (searchTypeCmb.SelectedIndex == 1) // Если поиск по ID
+            {
+                if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+                {
+                    e.Handled = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Обработчик смены выбранной книги в комбобоксе. Отображает информацию о выбранной книге.
+        /// </summary>
         private void BookSelectCmb_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (bookSelectCmb.SelectedItem != null)
             {
-                string selectedBookInfo = bookSelectCmb.SelectedItem.ToString();
-                int bookId = ExtractBookId(selectedBookInfo);
-
+                int bookId = ExtractId(bookSelectCmb.SelectedItem.ToString());
                 BookShelf selectedShelf = GetSelectedBookShelf();
                 if (selectedShelf != null)
                 {
                     Book selectedBook = selectedShelf.FindBookById(bookId);
-                    if (selectedBook != null)
-                        DisplayBookInfo(selectedBook);
+                    if (selectedBook != null) DisplayBookInfo(selectedBook);
                 }
             }
         }
 
-        private void UpdateShelfComboBox()
+        /// <summary>
+        /// Выводит данные о книге в текстовые поля на панели информации.
+        /// </summary>
+        private void DisplayBookInfo(Book book)
         {
-            shelfSelectCmb.Items.Clear();
-            foreach (var shelf in bookShelves)
-            {
-                shelfSelectCmb.Items.Add($"Шкаф {shelf.Id} ({shelf.Genre})");
-            }
+            bookTitleField.Text = book.DisplayTitle;
+            bookAuthorField.Text = book.Author;
+            bookIDField.Text = book.Id.ToString();
 
-            if (shelfSelectCmb.Items.Count > 0)
-                shelfSelectCmb.SelectedIndex = 0;
+            // СРАЗУ показываем итоговую розничную цену с нашей наценкой 10%
+            decimal retailPrice = book.BaseCost * 1.10m;
+            bookPriceField.Text = retailPrice.ToString("C");
+
+            bookPagesCountField.Text = book.Pages.ToString();
         }
 
+        /// <summary>
+        /// Обновляет тексты на вкладке Покупателей
+        /// </summary>
+        private void UpdateCustomersTab()
+        {
+            // Обновляем текст с количеством недовольных
+            // ЗАМЕНИ dissatisfiedLabel на реальное имя твоего красного текста!
+            unsatisfiedLabel.Text = $"Недовольных клиентов: {_gameManager.DissatisfiedCustomers}/{_gameManager.MaxDissatisfied}";
+
+            // Проверяем очередь
+            if (_gameManager.CustomerQueue.Count == 0)
+            {
+                // ЗАМЕНИ customerRequestLabel на реальное имя твоего текста по центру!
+                lblNoCustomers.Text = "У Вас пока нет ни одного покупателя";
+                lblNoCustomers.ForeColor = Color.Gray;
+            }
+            else
+            {
+                // Если покупатель есть, выводим его желание!
+                Customer currentCustomer = _gameManager.CustomerQueue.Peek();
+                lblNoCustomers.Text = $"ПОКУПАТЕЛЬ ПРОСИТ:\n{currentCustomer.ToString()}";
+                lblNoCustomers.ForeColor = Color.Black;
+            }
+        }
+
+        /// <summary>
+        /// Возвращает объект шкафа, выбранного в данный момент в комбобоксе шкафов.
+        /// </summary>
         private BookShelf GetSelectedBookShelf()
         {
             if (shelfSelectCmb.SelectedItem == null) return null;
-
-            string selectedShelf = shelfSelectCmb.SelectedItem.ToString();
-            int shelfId = ExtractShelfId(selectedShelf);
-
-            return bookShelves.FirstOrDefault(s => s.Id == shelfId);
+            int shelfId = ExtractId(shelfSelectCmb.SelectedItem.ToString().Replace("Шкаф ", ""));
+            return _gameManager.Shop.Shelves.FirstOrDefault(s => s.Id == shelfId);
         }
 
-        private void ClearNewBookFields()
+        /// <summary>
+        /// Извлекает числовой идентификатор из строки.
+        /// </summary>
+        private int ExtractId(string text)
         {
-            bookNameField.Clear();
-            authorField.Clear();
-            ganreComboBox.SelectedIndex = -1;
-            pagesCountNumbericUpDown.Value = pagesCountNumbericUpDown.Minimum;
-            priceNumbericUpDown.Value = priceNumbericUpDown.Minimum;
-        }
-
-        private void UpdateBooksInShelf()
-        {
-            bookSelectCmb.Items.Clear();
-            BookShelf selectedShelf = GetSelectedBookShelf();
-            if (selectedShelf != null)
-            {
-                var booksInShelf = selectedShelf.GetAllBooks();
-                foreach (var book in booksInShelf)
-                {
-                    bookSelectCmb.Items.Add($"{book.Id}: {book.DisplayTitle} - {book.Author}");
-                }
-
-                shelfCapacity.Text = $"Загруженность {booksInShelf.Count}/{selectedShelf.Capacity}";
-                shelfCapacity.ForeColor = booksInShelf.Count >= selectedShelf.Capacity ? Color.Red : Color.Black;
-            }
-        }
-
-        private void DisplayBookInfo(Book book)
-        {
-            if (book != null)
-            {
-                bookTitleField.Text = book.DisplayTitle;
-                bookAuthorField.Text = book.Author;
-                bookIDField.Text = book.Id.ToString();
-                bookPriceField.Text = book.Price.ToString("C");
-                bookPagesCountField.Text = book.Pages.ToString();
-            }
-        }
-
-        private void ClearBookInfo()
-        {
-            bookTitleField.Clear();
-            bookAuthorField.Clear();
-            bookIDField.Clear();
-            bookPriceField.Clear();
-            bookPagesCountField.Clear();
-        }
-
-        private void UpdateBalanceDisplay()
-        {
-            if (shop != null)
-                balanceLb.Text = $"Баланс: {shop.Balance:C}";
-        }
-
-        private int ExtractBookId(string bookInfo)
-        {
-            if (string.IsNullOrEmpty(bookInfo)) return 0;
-            string[] parts = bookInfo.Split(':');
+            if (string.IsNullOrEmpty(text)) return 0;
+            string[] parts = text.Split(new[] { ':', ' ' }, StringSplitOptions.RemoveEmptyEntries);
             return int.TryParse(parts[0], out int id) ? id : 0;
         }
 
-        private int ExtractShelfId(string shelfInfo)
+        /// <summary>
+        /// Очищает текстовые поля информации об уже добавленной книге.
+        /// </summary>
+        private void ClearBookInfo()
         {
-            if (string.IsNullOrEmpty(shelfInfo)) return 0;
+            bookTitleField.Clear(); bookAuthorField.Clear();
+            bookIDField.Clear(); bookPriceField.Clear(); bookPagesCountField.Clear();
+        }
 
-            int startIndex = shelfInfo.IndexOf(' ') + 1;
-            int endIndex = shelfInfo.IndexOf(' ', startIndex);
+        /// <summary>
+        /// Очищает поля формы создания/заказа новой книги.
+        /// </summary>
+        private void ClearNewBookFields()
+        {
+            bookNameField.Clear(); authorField.Clear(); ganreComboBox.SelectedIndex = -1;
+        }
 
-            if (startIndex > 0 && endIndex > startIndex)
+        /// <summary>
+        /// Проверяет, заполнены ли все обязательные поля при создании книги.
+        /// </summary>
+        private bool ValidateBookFields()
+        {
+            if (string.IsNullOrWhiteSpace(bookNameField.Text) || string.IsNullOrWhiteSpace(authorField.Text) || ganreComboBox.SelectedItem == null)
             {
-                string idStr = shelfInfo.Substring(startIndex, endIndex - startIndex);
-                return int.TryParse(idStr, out int id) ? id : 0;
+                MessageBox.Show("Заполните все поля (Название, Автор, Жанр)", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
             }
+            return true;
+        }
 
-            return 0;
+        /// <summary>
+        /// Создает текстовые файлы "Базы данных" при первом запуске игры.
+        /// </summary>
+        private void CreateDataFilesIfNotExist()
+        {
+            try
+            {
+                if (!File.Exists(genresFile))
+                    File.WriteAllLines(genresFile, new[] { "Роман", "Фантастика", "Детектив", "Фэнтези" });
+
+                if (!File.Exists(bookAuthorPairsFile))
+                {
+                    File.WriteAllLines(bookAuthorPairsFile, new[] {
+                        "Бесы;Достоевский", "Преступление и наказание;Достоевский", "Война и мир;Толстой",
+                        "Анна Каренина;Толстой", "Мастер и Маргарита;Булгаков", "Собачье сердце;Булгаков",
+                        "Евгений Онегин;Пушкин", "Капитанская дочка;Пушкин", "Герой нашего времени;Лермонтов",
+                        "Мцыри;Лермонтов"
+                    });
+                }
+            }
+            catch (Exception) { }
+        }
+
+        /// <summary>
+        /// Принудительно включает двойную буферизацию для контролов (лечит мерцание TabControl)
+        /// </summary>
+        private void EnableDoubleBuffering(Control control)
+        {
+            typeof(Control).InvokeMember("DoubleBuffered",
+                System.Reflection.BindingFlags.SetProperty |
+                System.Reflection.BindingFlags.Instance |
+                System.Reflection.BindingFlags.NonPublic,
+                null, control, new object[] { true });
         }
     }
 }
