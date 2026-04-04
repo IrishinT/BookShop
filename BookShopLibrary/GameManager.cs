@@ -14,7 +14,7 @@ namespace BookShopLibrary
 
         public int MaxQueueSize { get; private set; }
         
-        // Счётчик неудовлетворённых клиентов (По ТЗ)
+        // Счётчик неудовлетворённых клиентов
         public int DissatisfiedCustomers { get; private set; } 
         public int MaxDissatisfied { get; private set; } = 3;
 
@@ -48,7 +48,7 @@ namespace BookShopLibrary
                 EndGame(true, "Рабочий день успешно завершён!");
         }
 
-        /// <summary> Заказ книги. По ТЗ деньги списываются сразу при нажатии кнопки. </summary>
+        /// <summary> Заказ книги. деньги списываются сразу при нажатии кнопки. </summary>
         public void OrderBook(string title, string author, string genre, int pages, decimal baseCost)
         {
             if (Shop.Balance < baseCost) throw new Exception("Недостаточно средств для заказа!");
@@ -74,7 +74,7 @@ namespace BookShopLibrary
 
             if (accept)
             {
-                // По ТЗ: "Если под книгу нет места... она остаётся в очереди, а пользователю демонстрируется предупреждение"
+                // Если под книгу нет места... она остаётся в очереди, а пользователю демонстрируется предупреждение
                 if (!Shop.CanFitBook(delivery.Book))
                 {
                     return "ВНИМАНИЕ: Нет места на полках! Поставка осталась в очереди.";
@@ -115,7 +115,7 @@ namespace BookShopLibrary
                 else
                     resultMsg = "Книга отклонена.";
 
-                // По ТЗ: деньги за отклоненный ЗАКАЗ не возвращаются
+                // деньги за отклоненный ЗАКАЗ не возвращаются
                 if (delivery.IsOrdered) resultMsg += " Средства за заказ не возвращены!";
             }
 
@@ -141,7 +141,7 @@ namespace BookShopLibrary
             decimal maxAllowedPrice = bookOffered.BaseCost * 1.15m; 
             if (requestedPrice > maxAllowedPrice)
             {
-                DissatisfiedCustomers++; // По ТЗ: счетчик неудовлетворенных растет
+                DissatisfiedCustomers++; // счетчик неудовлетворенных растет
                 CustomerQueue.Dequeue();
                 CheckLossConditions();
                 return CustomerServiceResult.PriceTooHigh;

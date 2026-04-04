@@ -25,7 +25,7 @@ namespace BookShopLibrary
             LoadPairs();
             LoadGenres();
             
-            // ТРЕБОВАНИЕ ТЗ: В "Базу данных" изначально должны добавляться все 10 пар
+            // В "Базу данных" изначально должны добавляться все 10 пар
             LogEvent("--- НОВЫЙ ИГРОВОЙ ДЕНЬ НАЧАТ ---");
             string initialPairsLog = "Изначально загруженные пары в Базу Данных:\n" + 
                                      string.Join("\n", BookAuthorPairs.Select(p => $"{p.Title} - {p.Author}"));
@@ -46,7 +46,6 @@ namespace BookShopLibrary
                     BookAuthorPairs.Add((parts[0].Trim(), parts[1].Trim()));
             }
 
-            // Проверка строгого требования ТЗ
             if (BookAuthorPairs.Count < 10)
                 throw new Exception("По ТЗ в файле book-author-pairs.txt должно быть минимум 10 пар книга-автор!");
         }
@@ -59,7 +58,7 @@ namespace BookShopLibrary
         }
 
         /// <summary>
-        /// Ручное добавление новой книги (Заказ). Записывается в файл и лог (Требование ТЗ).
+        /// Ручное добавление новой книги (Заказ). Записывается в файл и лог
         /// </summary>
         public static void AddNewPair(string title, string author)
         {

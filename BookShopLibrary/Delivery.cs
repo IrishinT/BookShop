@@ -41,7 +41,7 @@ namespace BookShopLibrary
         {
             if (errorToInject == DeliveryErrorType.Plagiarism)
             {
-                // Плагиат: перемешивание автора (по ТЗ)
+                // Плагиат: перемешивание автора
                 var otherAuthors = DatabaseManager.BookAuthorPairs
                     .Select(p => p.Author).Where(a => a != book.Author).Distinct().ToList();
 
@@ -49,7 +49,6 @@ namespace BookShopLibrary
             }
             else if (errorToInject == DeliveryErrorType.Typo)
             {
-                //  СТРОГО через цикл do-while (по ТЗ)
                 char[] titleArray = book.Title.ToCharArray();
                 int indexToChange = random.Next(0, titleArray.Length);
                 char originalChar = titleArray[indexToChange];

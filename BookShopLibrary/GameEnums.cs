@@ -1,7 +1,7 @@
 namespace BookShopLibrary
 {
     /// <summary>
-    /// Типы ошибок в поставке (согласно ТЗ)
+    /// Типы ошибок в поставке
     /// </summary>
     public enum DeliveryErrorType
     {
@@ -16,7 +16,7 @@ namespace BookShopLibrary
     public enum CustomerServiceResult
     {
         Success,        // Успешная продажа
-        PriceTooHigh,   // Наценка больше 15% (по ТЗ клиент уходит)
+        PriceTooHigh,   // Наценка больше 15%
         WrongBook,      // Предложена не та книга или не тот жанр
         NoCustomers     // Очередь пуста
     }
