@@ -592,19 +592,17 @@ namespace BookShop
         private void UpdateCustomersTab()
         {
             // Обновляем текст с количеством недовольных
-            // ЗАМЕНИ dissatisfiedLabel на реальное имя твоего красного текста!
             unsatisfiedLabel.Text = $"Недовольных клиентов: {_gameManager.DissatisfiedCustomers}/{_gameManager.MaxDissatisfied}";
 
             // Проверяем очередь
             if (_gameManager.CustomerQueue.Count == 0)
             {
-                // ЗАМЕНИ customerRequestLabel на реальное имя твоего текста по центру!
                 lblNoCustomers.Text = "У Вас пока нет ни одного покупателя";
                 lblNoCustomers.ForeColor = Color.Gray;
             }
             else
             {
-                // Если покупатель есть, выводим его желание!
+                // Если покупатель есть, выводим его желание
                 Customer currentCustomer = _gameManager.CustomerQueue.Peek();
                 lblNoCustomers.Text = $"ПОКУПАТЕЛЬ ПРОСИТ:\n{currentCustomer.ToString()}";
                 lblNoCustomers.ForeColor = Color.Black;
@@ -685,7 +683,7 @@ namespace BookShop
         }
 
         /// <summary>
-        /// Принудительно включает двойную буферизацию для контролов (лечит мерцание TabControl)
+        /// Принудительно включает двойную буферизацию для контролов
         /// </summary>
         private void EnableDoubleBuffering(Control control)
         {
